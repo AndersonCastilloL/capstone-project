@@ -1,0 +1,59 @@
+baseURL = "http://example.org/"
+defaultContentLanguage = "en"
+languageCode = "en"
+
+title = "Bike Availability Prediction Project"
+
+theme = "gokarna"
+
+# Automatically generate robots.txt
+enableRobotsTXT = true
+
+publishDir = "docs"
+
+[params]
+  footer = "The Cyclists"
+  description = "Data Science & Machine Learning Final Project"
+
+socialIcons = [
+    {name = "twitter", url = "https://example.com"},
+    {name = "linkedin", url = "https://example.com"},
+    {name = "stackoverflow", url = "https://example.com"},
+    {name = "dribbble", url = "https://example.com"},
+    {name = "instagram", url = "https://example.com"},
+    {name = "twitch", url = "https://example.com"},
+    {name = "email", url = "mailto:example@example.com"}
+]
+metaKeywords = ["blog", "gokarna", "hugo"]
+
+[menu]
+  [[menu.main]]
+    name = "Home"
+    pre = "<span data-feather='home'></span>"
+    url = "/"
+    weight = 1
+
+  [[menu.main]]
+    name = "Documentation"
+    pre = "<span data-feather='book'></span>"
+    url = "/posts/"
+    weight = 2
+
+  [[menu.main]]
+    name = "Tags"
+    pre = "<span data-feather='tag'></span>"
+    url = "/tags/"
+    weight = 3
+
+  [[menu.main]]
+    identifier = "github"
+    pre = "<span data-feather='github'></span>"
+    url = "https://github.com/526avijitgupta/gokarna"
+    weight = 4
+
+
+[markup]
+  [markup.tableOfContents]
+    startLevel = 1
+    endLevel = 4
+    ordered = false
