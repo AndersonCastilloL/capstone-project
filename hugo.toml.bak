@@ -9,6 +9,8 @@ theme = "gokarna"
 # Automatically generate robots.txt
 enableRobotsTXT = true
 
+publishDir = "docs"
+
 [params]
   footer = "The Cyclists"
   description = "Data Science & Machine Learning Final Project"
