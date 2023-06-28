@@ -146,30 +146,21 @@
 
     <div class="post-content">
         <p>
-            <h2 id="whats-bicing-">What&rsquo;s Bicing ?</h2>
-<p>The new Bicing service includes more territorial coverage, an increase in the number of bicycles, mixed stations for conventional and electric bicycles, new and improved types of stations and bicycles (safety, anchorage, comfort), extended schedules and much more!</p>
-<h2 id="goal">Goal</h2>
-<p>There are two main objective in this project:</p>
+            <h2 id="introduction">Introduction</h2>
+<p>The Bicing service is a great way to navigate through the city of Barcelona, leveraging its extensive bike lane network. Nowadays, electric bikes are also available, and so the usage of the service has grown quite a bit over the years.
+In this study the main objective is to try to predict the availability of free docks throughout the city during march of 2023 using data from the previous 4 years, this being a really important feature to guide the users to the best stations, not westing any time looking for bikes/free docks.
+Apart from this prediction task, we have also looked at the evolution of the usage of the network by using heatmaps, and tried to look for places along bike lanes where the construction of future stations could make sense.</p>
+<p>The notebook where all the analysis has been done can be found in the GitHub repository, but due to the huge size of the datasets, the full project can be found in the following <a href="https://drive.google.com/drive/folders/1ZIY2ZMhsCITuSFC1bnIDJrbZh-sS63HP?usp=drive_link">Google Drive</a> folder. In there you will be able to find all the data used, aswell as the models and other figures and material.</p>
+<h2 id="gathering-the-data">Gathering the Data</h2>
+<p>For this data project, we have started off with the following data:</p>
 <ul>
 <li>
-<p>Predict the number of free docks given the historical data (Docks Availability Percent).</p>
+<p>The bicing stations information and status, obtained from <a href="https://opendata-ajuntament.barcelona.cat">Open Data BCN</a></p>
 </li>
 <li>
-<p>Explore new places where stations are needed.</p>
-</li>
-<li>
-<p>Explore how different events affect availability.</p>
+<p>The weather of the city of Barcelona, obtained from the <a href="https://www.meteo.cat">Meteo Cat</a> public API</p>
 </li>
 </ul>
-<h2 id="get-the-data">Get the Data</h2>
-<p>According with the project we have the next sources:</p>
-<ul>
-<li>The bicing stations status</li>
-<li>The bicing stations information</li>
-<li>The weather of the city of Barcelona</li>
-</ul>
-<p>The Bicing stations status and information of the city of Barcelona were downloaded from <a href="https://opendata-ajuntament.barcelona.cat">Open Data BCN</a> and the weather information to join with bicing stations were downloaded from <a href="https://www.meteo.cat">Meteo Cat</a>.</p>
-<h3 id="a-download-the-data">a. Download the Data</h3>
 <p>The following script was used to download the data from <a href="https://opendata-ajuntament.barcelona.cat">Open Data BCN</a> by year and month:</p>
 <div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>import os
 </span></span><span style="display:flex;"><span>
@@ -179,155 +170,89 @@
 </span></span><span style="display:flex;"><span>        os.system<span style="color:#f92672">(</span>f<span style="color:#e6db74">&#34;wget &#39;https://opendata-ajuntament.barcelona.cat/resources/bcn/BicingBCN/{year}_{month:02d}_{month_name}_BicingNou_ESTACIONS.7z&#39;&#34;</span><span style="color:#f92672">)</span>
 </span></span><span style="display:flex;"><span>        os.system<span style="color:#f92672">(</span>f<span style="color:#e6db74">&#34;7z x &#39;{year}_{month:02d}_{month_name}_BicingNou_ESTACIONS.7z&#39;&#34;</span><span style="color:#f92672">)</span>
 </span></span><span style="display:flex;"><span>        os.system<span style="color:#f92672">(</span>f<span style="color:#e6db74">&#34;rm &#39;{year}_{month:02d}_{month_name}_BicingNou_ESTACIONS.7z&#39;&#34;</span><span style="color:#f92672">)</span>
-</span></span></code></pre></div><p>The following script was used to download the data from <a href="https://www.meteo.cat">Meteo Cat</a> and integrate it into the station availability patterns</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#75715e"># CODE TO RETRIEVE DATA FROM THE WEATHER API AND STORE IT IN A CSV FILE</span>
-</span></span><span style="display:flex;"><span><span style="color:#75715e"># FROM 2019/01/01 TO 2023/03/31</span>
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> requests
-</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> time
-</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> datetime <span style="color:#66d9ef">as</span> dt
-</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> csv 
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>key <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;enJH8FUX2z5Ar7NSCJvYI8pAIuDW0XDV9nbSkEMj&#39;</span>
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>start_date <span style="color:#f92672">=</span> dt<span style="color:#f92672">.</span>date(<span style="color:#ae81ff">2019</span>, <span style="color:#ae81ff">1</span>, <span style="color:#ae81ff">1</span>)
-</span></span><span style="display:flex;"><span>end_date <span style="color:#f92672">=</span> dt<span style="color:#f92672">.</span>date(<span style="color:#ae81ff">2023</span>, <span style="color:#ae81ff">3</span>, <span style="color:#ae81ff">31</span>)
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#66d9ef">assert</span> start_date <span style="color:#f92672">&lt;</span> end_date, <span style="color:#e6db74">&#39;Start date must be before end date&#39;</span>
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>delta <span style="color:#f92672">=</span> dt<span style="color:#f92672">.</span>timedelta(days<span style="color:#f92672">=</span><span style="color:#ae81ff">1</span>)
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>freq <span style="color:#f92672">=</span> <span style="color:#ae81ff">1</span><span style="color:#f92672">/</span><span style="color:#ae81ff">20</span>
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>day <span style="color:#f92672">=</span> start_date
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>columns <span style="color:#f92672">=</span> [<span style="color:#e6db74">&#39;timestamp&#39;</span>, <span style="color:#e6db74">&#39;mm_precip&#39;</span>, <span style="color:#e6db74">&#39;temperature&#39;</span>]
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#66d9ef">with</span> open(<span style="color:#e6db74">&#39;weather_data/weather.csv&#39;</span>, mode <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;w&#39;</span>, newline<span style="color:#f92672">=</span><span style="color:#e6db74">&#39;&#39;</span>) <span style="color:#66d9ef">as</span> csvfile:
-</span></span><span style="display:flex;"><span>    writer <span style="color:#f92672">=</span> csv<span style="color:#f92672">.</span>DictWriter(csvfile, fieldnames<span style="color:#f92672">=</span>columns)
-</span></span><span style="display:flex;"><span>    writer<span style="color:#f92672">.</span>writeheader()
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">while</span> day <span style="color:#f92672">&lt;=</span> end_date:
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>        day_string <span style="color:#f92672">=</span> day<span style="color:#f92672">.</span>strftime(<span style="color:#e6db74">&#39;%Y/%m/</span><span style="color:#e6db74">%d</span><span style="color:#e6db74">&#39;</span>)
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>        url <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;https://api.meteo.cat/xema/v1&#39;</span> <span style="color:#f92672">+</span> <span style="color:#e6db74">&#39;/estacions/mesurades/X8/&#39;</span> <span style="color:#f92672">+</span> day_string 
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>        print(day_string)
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>        headers <span style="color:#f92672">=</span> {<span style="color:#e6db74">&#39;Accept&#39;</span>: <span style="color:#e6db74">&#39;application/json&#39;</span>, <span style="color:#e6db74">&#39;X-API-KEY&#39;</span>: key}
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>        data <span style="color:#f92672">=</span> requests<span style="color:#f92672">.</span>get(url, headers<span style="color:#f92672">=</span>headers)<span style="color:#f92672">.</span>json()[<span style="color:#ae81ff">0</span>]
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>        <span style="color:#75715e"># the codi variables, 35 and 32, correspond to precipitation and temperature respectively. The json file retrieved</span>
-</span></span><span style="display:flex;"><span>        <span style="color:#75715e"># contains information on many more variables, but we are only interested in these two.</span>
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>        precipitation <span style="color:#f92672">=</span> [data[<span style="color:#e6db74">&#39;variables&#39;</span>][i][<span style="color:#e6db74">&#39;lectures&#39;</span>] <span style="color:#66d9ef">for</span> i <span style="color:#f92672">in</span> range(len(data[<span style="color:#e6db74">&#39;variables&#39;</span>])) <span style="color:#66d9ef">if</span> data[<span style="color:#e6db74">&#39;variables&#39;</span>][i][<span style="color:#e6db74">&#39;codi&#39;</span>] <span style="color:#f92672">==</span> <span style="color:#ae81ff">35</span>][<span style="color:#ae81ff">0</span>]
-</span></span><span style="display:flex;"><span>        temperature <span style="color:#f92672">=</span> [data[<span style="color:#e6db74">&#39;variables&#39;</span>][i][<span style="color:#e6db74">&#39;lectures&#39;</span>] <span style="color:#66d9ef">for</span> i <span style="color:#f92672">in</span> range(len(data[<span style="color:#e6db74">&#39;variables&#39;</span>])) <span style="color:#66d9ef">if</span> data[<span style="color:#e6db74">&#39;variables&#39;</span>][i][<span style="color:#e6db74">&#39;codi&#39;</span>] <span style="color:#f92672">==</span> <span style="color:#ae81ff">32</span>][<span style="color:#ae81ff">0</span>]
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>        date_variables <span style="color:#f92672">=</span> [{<span style="color:#e6db74">&#39;timestamp&#39;</span>:int(dt<span style="color:#f92672">.</span>datetime<span style="color:#f92672">.</span>strptime(d[<span style="color:#e6db74">&#39;data&#39;</span>], <span style="color:#e6db74">&#39;%Y-%m-</span><span style="color:#e6db74">%d</span><span style="color:#e6db74">T%H:%MZ&#39;</span>)<span style="color:#f92672">.</span>timestamp()), <span style="color:#e6db74">&#39;mm_precip&#39;</span>:d[<span style="color:#e6db74">&#39;valor&#39;</span>]} <span style="color:#66d9ef">for</span> d <span style="color:#f92672">in</span> precipitation]
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">for</span> i <span style="color:#f92672">in</span> range(len(date_variables)):
-</span></span><span style="display:flex;"><span>            date_variables[i][<span style="color:#e6db74">&#39;temperature&#39;</span>] <span style="color:#f92672">=</span> temperature[i][<span style="color:#e6db74">&#39;valor&#39;</span>]
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>        writer<span style="color:#f92672">.</span>writerows(date_variables)
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>        day <span style="color:#f92672">+=</span> delta
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>        time<span style="color:#f92672">.</span>sleep(freq)
-</span></span></code></pre></div><p>Due to the capacity of the data, they are stored in <a href="https://drive.google.com/drive/folders/1ZIY2ZMhsCITuSFC1bnIDJrbZh-sS63HP?usp=drive_link">Google Drive</a>.</p>
-<h3 id="b-consolidate-the-data">b. Consolidate the Data</h3>
-<p>The consolidation of the Data was built in Tableau using Tableau Prep which give us more flexibility to join, filter and build the next structure according with our metadata-sample-submission.csv</p>
+</span></span></code></pre></div><p>And the script used to do requests on the <a href="https://www.meteo.cat">Meteo Cat</a> public API can be found on the Google Drive of the project, in the weather folder.</p>
+<h3 id="b-data-merging">b. Data merging</h3>
+<p>The data obtained from <a href="https://opendata-ajuntament.barcelona.cat">Open Data BCN</a> is separated into multiple datasets, each one containing either the information or the status of the stations for each month. To work with so many huge datasets at the same time, the processing of the data was done in Tableau using Tableau Prep which give us more flexibility to join, filter and build the next structure according to our metadata-sample-submission.csv</p>
 <h4 id="metadata-sample-submission">Metadata Sample Submission</h4>
 <p><img src="/capstone-project/metadata-sample-submission.png" alt="Metadata Sample Submission"></p>
-<h2 id="discover-and-visualize-the-data-to-gain-insights">Discover and visualize the data to gain insights</h2>
-<p>Data consolidation, visualization and analysis with Tableau</p>
+<h2 id="data-exploration">Data exploration</h2>
+<p>All of the following analysis, as already mentiones, has been done with tableau due to its low Ram demand and speed.</p>
 <h3 id="a-tableau-workflow">a. Tableau Workflow</h3>
-<p>The first flow in Tableau Prep let you consolidate the bicing station status files of all years and create new columns like year, month, day and hour.
-The flow has two sub-flows because is necessary applied the same process to bicing station 2023 files. Both flows create new files with a hyper format which is easier to manage and control the data.</p>
+<p>The first flow in Tableau Prep concatenates all the bicing station status files of all years and creates new columns like year, month, day and hour.
+The flow has two sub-flows because is necessary to also apply the same process to bicing station 2023 files. Both flows create new files with a hyper format which is easier to manage and control.</p>
 <p><img src="/capstone-project/first-tableau-flow.png" alt="First Tableau flow"></p>
-<p>The second flow in Tableau Prep get the hyper files of bicing station status (2019-2022) to join with the last bicing station information (March, 2023) to get the extra information like longitude, latitude, name, capacity and postcode.</p>
+<p>The second flow in Tableau Prep gets the hyper files of bicing station status (2019-2022) and merges them with the last bicing station information (March, 2023) to get information on longitude, latitude, name, capacity and postcode.
+At this point the first relevant approximation is made, as the capacity of the stations in the training data is taken as the one from 2023 and not the &ldquo;real&rdquo; one.</p>
 <p><img src="/capstone-project/second-tableau-flow.png" alt="Second Tableau flow"></p>
 <p>The same process is applied to the bicing station status 2023 but filtering docks_availability and bike_availability. These fields will be evaluated and predicted by the models.</p>
 <p><img src="/capstone-project/third-tableau-flow.png" alt="Third Tableau flow"></p>
-<p>Finally, the last flow transform the input data of the preview flow using a aggregation to the level year, month, day and hour calculating average of the rest of fields and creating four additional fields with the percent of docks availability in the four hours before.</p>
+<p>Finally, the last flow transforms the input data of the preview flow using an aggregation to year, month, day and hour, calculating averages on the rest of fields and creating four additional fields with the percentage of docks available in the four hours before.</p>
 <p><img src="/capstone-project/fourth-tableau-flow.png" alt="Fourth Tableau flow"></p>
 <p>Before training and testing, the data is analyzed to identify patterns, outliers and to visualize relevant features.</p>
-<h3 id="b-analysis-in-tableau">b. Analysis in Tableau</h3>
-<p>Visual analysis of data constructed based on the final output to identify outliers, COVID behaviors and relevant characteristics before training and testing with machine learning models</p>
+<h3 id="b-visual-analysis-in-tableau">b. Visual Analysis in Tableau</h3>
+<p>Before training and testing with machine learning models, we used the following charts to visually analyze the data constructed based on the final output to identify outliers, COVID behaviors and relevant characteristics</p>
 <p><img src="/capstone-project/bicing-data-analysis.png" alt="Bicing Data Analysis"></p>
-<p>With all the consolidate information we start to clean and processes the data to prepare our dataframes of training and testings.</p>
+<p>Where we can see that as expected, the percentage of docks available increases as we get to upper areas of the city, where the users take the bikes and ride them downhill to the lower areas.
+Also, we canb observe the effects of covid, especially in 2020 where the lockdown shows up as no available bikes.</p>
 <h2 id="prepare-the-data-for-machine-learning-algorithms">Prepare the data for Machine Learning algorithms</h2>
-<h3 id="a-importation-of-data-in-colab">a. Importation of data in Colab</h3>
-<p>We load the dataframes of bicing station (validation and training), weather and testing.</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span>station_dataframe <span style="color:#f92672">=</span> dd<span style="color:#f92672">.</span>read_csv(<span style="color:#e6db74">&#39;/content/drive/MyDrive/CapstoneProject/data_bicing_joined_HX_23.csv&#39;</span>, assume_missing<span style="color:#f92672">=</span><span style="color:#66d9ef">True</span>, delimiter<span style="color:#f92672">=</span><span style="color:#e6db74">&#39;;&#39;</span>)
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>weather_dataframe <span style="color:#f92672">=</span> dd<span style="color:#f92672">.</span>read_csv(<span style="color:#e6db74">&#39;/content/drive/MyDrive/CapstoneProject/weather.csv&#39;</span>, assume_missing<span style="color:#f92672">=</span><span style="color:#66d9ef">True</span>, delimiter<span style="color:#f92672">=</span><span style="color:#e6db74">&#39;,&#39;</span>)
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>data_2_predict <span style="color:#f92672">=</span> dd<span style="color:#f92672">.</span>read_csv(<span style="color:#e6db74">&#39;/content/drive/MyDrive/CapstoneProject/metadata_sample_submission.csv&#39;</span>, delimiter<span style="color:#f92672">=</span><span style="color:#e6db74">&#39;,&#39;</span>)
-</span></span></code></pre></div><h3 id="b-data-cleaning-and-filtering">b. Data Cleaning and Filtering</h3>
-<ul>
-<li>Initial cleaning to go from the format that the Tableau merger outputs to the one desired for the model.</li>
-<li>The objective of this first step is to leave the training data in the same format as the submission one.</li>
-<li>Drop all rows with out of service stations and year 2020, to avoid COVID effects on our training data.</li>
-<li>Select the features with the highest relevance (station_id, lat, lon, year, month, day, hour, ctx-4, ctx-3, ctx-2, ctx-1, percentage).</li>
-<li>Split the data into training and validation.</li>
-<li>Filter only the data with status &ldquo;IN_SERVICE&rdquo;.</li>
-</ul>
-<h3 id="c-processing-pipelines">c. Processing pipelines</h3>
-<p>Apart from the preprocessing done using tableau to create the initial dataframe, everything else will be done using sklearn pipelines.</p>
-<p>Creation of the 4 pipelines:</p>
+<p>Once we have merged all the datasets into one huge one, the next step is to process all the information, now in python using Google Colab. All of this process has been done in the following steps:</p>
+<h3 id="b-data-cleaning-and-filtering">b. Data Cleaning and Filtering</h3>
+<p>To start, we have to clean the raw data that Tableau outputs following:</p>
 <ul>
 <li>
-<p>train_preparator:</p>
-<ul>
-<li>to prepare the training data, not used for the submission data as we already have location data.</li>
-<li>we have five transformers. The first merge the data with weather dataframe and include the creation of the datatime column.</li>
-<li>the second transform add new columns of time.</li>
-<li>the third and fourth transformer filter the hours to avoid overlapping and normalize datetime columnes like month, day, hour and year.</li>
-</ul>
+<p>Initial cleaning to go from the format that the Tableau merger outputs to the one desired for the model. The objective of this first step is to leave the training data in the same format as the submission one.</p>
 </li>
 <li>
-<p>submisison_preparator and val_preparator:</p>
-<ul>
-<li>to prepare the submission data, not used for the training data as we don&rsquo;t have location data. Not a problem since we are not fitting to any data, just transforming with data we already have</li>
-<li>we keep the same transformers of the previous pipeline because we want to have the same structure with the data.</li>
+<p>Drop all rows with out of service stations and year 2020, to avoid COVID effects on our training data.</p>
+</li>
+<li>
+<p>Select the features with the highest relevance (station_id, lat, lon, year, month, day, hour, ctx-4, ctx-3, ctx-2, ctx-1, percentage).</p>
+</li>
+<li>
+<p>Split the data, by leaving 1029, 2021 and 2022 for training and 2023 for validation.</p>
+</li>
+<li>
+<p>Filter only the data with status &ldquo;IN_SERVICE&rdquo;.</p>
+</li>
 </ul>
+<h3 id="c-processing-pipelines">c. Processing pipelines</h3>
+<p>Apart from the preprocessing done using tableau to create the initial dataframe, everything else will be done using sklearn pipelines. We have built 4 different ones:</p>
+<ul>
+<li>
+<p>train_preparator: Adds the weather data, classifies the registers in 5 hour intervals and marks them with a 1 if they correspond to a weekend day, selects only 5 hours of the day to prevent overlapping between registers and normalizes the time data.</p>
+</li>
+<li>
+<p>val_preparator: Same procedure as train_preparator but selecting all 24 hours of the day to resemble what the submission will contain</p>
+</li>
+<li>
+<p>submission_preparator: Again, same procedure, but also adding the location of the station to the dataset, as the one that we are using, downloaded from kaggle does not contain this valuable informatio</p>
 </li>
 <li>
 <p>scaling_pipeline:</p>
 <ul>
-<li>to fill and scale certain column in the data, used for both training and submission data. In this case, we are fitting to the training data, and transforming both training and submission data</li>
+<li>to fill and scale certain columns in the data, fitting it to the training data, and transforming both training and submission data.</li>
 </ul>
 </li>
 </ul>
 <h3 id="d-classes-and-functions">d. Classes and Functions</h3>
-<p>Each pipeline is supported by a set of functions and classes to structure the data and features. The functions are included like parameters inside of the classes.</p>
-<h4 id="functions">Functions</h4>
+<p>Each pipeline is supported by a set of functions and classes to structure the data and features. The functions are applied using classes that can be inserted in the pipelines and are the following:</p>
 <ul>
-<li>extra_time_info: add new columns of time like is_weekend, timeframe1, timeframe2, timeframe3, timeframe4, timeframe5 to group the hours</li>
-<li>hour_selector: filter a range of hours to avoid overlapping with the columns with the same information of one to four hours before</li>
-<li>time_norm: Time normalizer function to normalize the time columns to a 0-1 scale with periodicity. This is done by applying a sin and cos transformation to the columns</li>
-<li>weather_prep:
-<ul>
-<li>weather dataframe preparator to leave it in the desired format to merge with the station dataframe.</li>
-<li>We convert the half hourly data to hourly data by averaging temperature and summing precipitation</li>
-<li>We also add a column with the datetime in order to merge the dataframes</li>
-</ul>
+<li>
+<p>hour_selector: filter a range of hours to avoid overlapping with the columns with the same information of one to four hours before</p>
 </li>
-<li>weather_merge: Merge the main dataframe with weather dataframe and split datetime column in year, month, day and hour</li>
-</ul>
-<h4 id="classes">Classes</h4>
-<ul>
-<li>hour_selector_transformer: class to encapsulate the range of hours.</li>
-<li>station_loc_transformer: class to join and encapsulate the latitude and longitude.</li>
-<li>station_id_dropper: the class use station id dropper function to drop the station_id column from the dataset at the end of the pipeline. The prediction will be done on the location of the stations, not on the id.</li>
-<li>time_norm_transformer: class to encapsulate a time columns and normalize them using time_norm function.</li>
-<li>weather_merge_transformer: class to encapsulate the weather data and merge with main dataframe.</li>
+<li>
+<p>extra_time_info: add new columns of time like is_weekend, timeframe1, timeframe2, timeframe3, timeframe4, timeframe5 to group the hours. These timeframe columns are used to mitigate the effects of only training with 5 hours, by grouping all the ones in between.</p>
+</li>
+<li>
+<p>time_norm: Time normalizer function to normalize the time columns to a -1/1 scale with periodicity. This is done by applying a sin and cos transformation to the columns</p>
+</li>
+<li>
+<p>weather_merge: Merge the main dataframe with weather dataframe and split datetime column in year, month, day and hour</p>
+</li>
 </ul>
 <h3 id="e-prepare-all-data-and-load-data-that-has-been-saved">e. Prepare all data and load data that has been saved</h3>
-<p>The following code load the data has been saved in the prepped_data folder, so there is no need to run this code again. We will just load it from our folder to work with the models</p>
-<p>We have three datasets. The first dataset is for training purposes, the second dataset considers only a specific range of hours to avoid overlapping data with the columns, and the last dataset is our test dataset, which is loaded on Kaggle.</p>
+<p>Once we have our pipelines ready we pass through them the data to obtain 4 datasets.</p>
+<p>We have three datasets. The first dataset is for training purposes, the second dataset is for validation, considering only a specific range of hours just like in the training one, the third one is another validation dataset but now containing all 24 hours to compare the effects of this restriction on the training process, and the fourth one is the submission dataset.</p>
 <ul>
 <li>
 <p>Training Dataset</p>
@@ -347,11 +272,12 @@ The flow has two sub-flows because is necessary applied the same process to bici
 </li>
 </ul>
 <h2 id="model-selection-and-training">Model Selection and Training</h2>
-<p>For this project we will use 2 different models. The first one is an xgboost regressor, that has been chosen following other similar projects to this one and that has outperformed with less training times other similar ensemble models. Then, a neural network containing LSTM layers is used to capture the temporal features and their ordering.</p>
+<p>For this project we will use 2 different models. The first one is an xgboost regressor, that has been chosen following other similar projects to this one and that has outperformed with less training times other similar ensemble models. Then, a neural network containing LSTM layers is used to capture the temporal features and their ordering.
+We will start off with the xgboost models.</p>
 <h3 id="a-xgbregressor">a. XGBregressor</h3>
 <p>We will first use a data subset to perform a grid search on the parameter space to find the ones that fit the best our xgboost model.</p>
-<h4 id="randomizedsearchcv-and-gridsearchcv">RandomizedSearchCV and GridSearchCV</h4>
-<p>We apply both techniques to find the best parameters for our model after transforming our data using pipelines. We use an XGBRegressor and a set of parameters associated with it to evaluate the optimal parameters for training and prediction.</p>
+<h4 id="parameter-tuning-using-gridsearchcv">Parameter tuning using GridSearchCV</h4>
+<p>We apply grid searhc with cross validation find the best parameters for our model after transforming our data using pipelines. We use an XGBRegressor and a set of parameters associated with it to evaluate the optimal parameters for training and prediction.</p>
 <div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span>space <span style="color:#f92672">=</span> {
 </span></span><span style="display:flex;"><span>    <span style="color:#e6db74">&#39;learning_rate&#39;</span>: [<span style="color:#ae81ff">0.1</span>, <span style="color:#ae81ff">0.01</span>, <span style="color:#ae81ff">0.001</span>],
 </span></span><span style="display:flex;"><span>    <span style="color:#e6db74">&#39;max_depth&#39;</span>: [<span style="color:#ae81ff">3</span>, <span style="color:#ae81ff">5</span>, <span style="color:#ae81ff">7</span>],
@@ -367,6 +293,7 @@ The flow has two sub-flows because is necessary applied the same process to bici
 </span></span><span style="display:flex;"><span>grid_search<span style="color:#f92672">.</span>fit(gs_subset, y_subset)
 </span></span></code></pre></div><p>Best parameters result</p>
 <p><img src="/capstone-project/grdsearch-best-parameters.png" alt="Best Parameters GridSearch"></p>
+<h4 id="training-the-xgbregressor-model">Training the XGBRegressor model</h4>
 <p>Now that we have the best parameters for our subset of data we train the model. We also use the validation dataset to monitor the performance of the model during training to look for over-fitting curves</p>
 <div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span>
 </span></span><span style="display:flex;"><span>xgb_model <span style="color:#f92672">=</span> XGBRegressor(objective<span style="color:#f92672">=</span><span style="color:#e6db74">&#39;reg:squarederror&#39;</span>, colsample_bytree<span style="color:#f92672">=</span><span style="color:#ae81ff">0.8</span>, gamma<span style="color:#f92672">=</span><span style="color:#ae81ff">0.1</span>, n_jobs<span style="color:#f92672">=-</span><span style="color:#ae81ff">1</span>, random_state<span style="color:#f92672">=</span><span style="color:#ae81ff">123</span>, eval_metric <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;rmse&#39;</span>, early_stopping_rounds <span style="color:#f92672">=</span> <span style="color:#ae81ff">30</span>)
@@ -386,9 +313,9 @@ The flow has two sub-flows because is necessary applied the same process to bici
 </span></span><span style="display:flex;"><span>
 </span></span><span style="display:flex;"><span>print(<span style="color:#e6db74">&#39;rmse:&#39;</span>, rmse)
 </span></span></code></pre></div><p>Once we have trained the model, we are interested in knowing how the loss evolved during training, as well as what variables were the most relevant to predict the percentage of available docks</p>
-<h4 id="loss-function-graphic">Loss Function Graphic</h4>
+<h5 id="loss-function-graphic">Loss Function Graphic</h5>
 <p><img src="/capstone-project/loss-function-xgboost.png" alt="Loss Function graphic"></p>
-<h4 id="most-relevant-features">Most Relevant Features</h4>
+<h5 id="most-relevant-features">Most Relevant Features</h5>
 <p><img src="/capstone-project/feature-importance-xgboost.png" alt="Feature Importances Graphic"></p>
 <p>The feature important plot is really interesting. From it we can conclude that:</p>
 <ul>
@@ -396,18 +323,41 @@ The flow has two sub-flows because is necessary applied the same process to bici
 <li>The location of the station are the next most relevant features. The usage of the service is not homogeneous across the city and this impacts to availability of docks</li>
 <li>timeframe2, corresponding to peak hours in the morning has quite a bit of weight. The stations network probably has the most activity in these hours</li>
 <li>the hour also affects quite a bit the final %, as expected &ndash;&gt; Since we are only training with</li>
-<li>The weather does not even appear in the graph. We expected way more weight from those variables, especially rain. We guess that since Barcelona is not a very rainy city, the model does not see many registers with rain and so it end up ignoring completely the variable</li>
+<li>The weather does not even appear in the graph. We expected way more weight from those variables, especially rain. We guess that since Barcelona is not a very rainy city, the model does not see many registers with rain and so it end up ignoring completely the variable.</li>
 </ul>
+<h4 id="second-xgbregresor-model">Second XGBRegresor model</h4>
+<p>In earlier version of the code we worked with a more complex model than the one that GridSearch found to be the best, and ended up getting better results. To try to replicate that behaviour and see if we can get a better performance we have also trained the following model using the same procedure:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>xgb_model2 <span style="color:#f92672">=</span> XGBRegressor(objective<span style="color:#f92672">=</span><span style="color:#e6db74">&#39;reg:squarederror&#39;</span>,
+</span></span><span style="display:flex;"><span>                          n_estimators<span style="color:#f92672">=</span><span style="color:#ae81ff">2000</span>,
+</span></span><span style="display:flex;"><span>                          max_depth<span style="color:#f92672">=</span><span style="color:#ae81ff">10</span>,
+</span></span><span style="display:flex;"><span>                          learning_rate<span style="color:#f92672">=</span><span style="color:#ae81ff">0.1</span>,
+</span></span><span style="display:flex;"><span>                          subsample<span style="color:#f92672">=</span><span style="color:#ae81ff">0.8</span>,
+</span></span><span style="display:flex;"><span>                          colsample_bytree<span style="color:#f92672">=</span><span style="color:#ae81ff">0.8</span>,
+</span></span><span style="display:flex;"><span>                          gamma<span style="color:#f92672">=</span><span style="color:#ae81ff">0.1</span>,
+</span></span><span style="display:flex;"><span>                          reg_alpha<span style="color:#f92672">=</span><span style="color:#ae81ff">0.1</span>,
+</span></span><span style="display:flex;"><span>                          reg_lambda<span style="color:#f92672">=</span><span style="color:#ae81ff">10.0</span>,
+</span></span><span style="display:flex;"><span>                          n_jobs<span style="color:#f92672">=-</span><span style="color:#ae81ff">1</span>,
+</span></span><span style="display:flex;"><span>                          random_state<span style="color:#f92672">=</span><span style="color:#ae81ff">128</span>,
+</span></span><span style="display:flex;"><span>                          early_stopping_rounds <span style="color:#f92672">=</span> <span style="color:#ae81ff">30</span>)
+</span></span></code></pre></div><p>Obtaining a slightly lower final rmse score (0.1019 vs 0.1100) and the following dfeature imporances and loss evolution curves:</p>
+<p><img src="/capstone-project/xgb_loss2.png" alt="Loss Function graphic">
+<img src="/capstone-project/xgb2_features.png" alt="Feature Importances Graphic"></p>
+<p>Which in this case show quite a bit more overfitting due to the complexity of the model and also more relevance given to the location of the stations. The temperature now also appears in the feature importance plot, but still not the rain.</p>
 <h3 id="b-lstm">b. LSTM</h3>
 <p>Apart from our xgbregressor model, and since our data contains historical data, we have also tried to study the prediction problem as a time-series analysis by working with long short-term memory layers on a neural network to try and exploit the temporal ordering of the information. Since not all the variables are historical, that have built a time series with just the one that are historical context, and we have treated the rest with a fully connected network. By using this approach our intention is to capture not only the static context of the data, but also the past that leads to each station&rsquo;s state.</p>
-<p>We construct a neural network by separating it into two parts, one for the time series data and one for the static data. The time series data is fed into an LSTM layer, the static data is fed into a dense layer</p>
+<p>To operate with the two groups of data, the nework starts off with 2 LSTM layers and a dense network that work in parallel and that process the temporal data and static data, respectively. After this, the outputs are concatenated and passed thorugh 3 final dense layers that lead to a single neuron with a sigmoid activation function that returns a value between 0 and 1.
+We have also added droupout layers to prevent overfitting (we will see that that is a problem with this model)</p>
 <h4 id="neural-network-structure">Neural Network Structure</h4>
 <p><img src="/capstone-project/neural-network-structure.png" alt="Neural Network"></p>
+<p><img src="/capstone-project/lstm_structure.png" alt="Neural Network"></p>
 <h4 id="neural-network-results">Neural Network Results</h4>
-<p><img src="/capstone-project/neural-network-results.png" alt="Neural Network Results"></p>
-<p>We get recall similar results to that of the xgb model &ndash;&gt; Further improvements should come from the hand of a better preproccesing probably, working with outliers and incorrect data in a more detailed way</p>
+<p><img src="/capstone-project/lstm_loss.png" alt="Neural Network Results"></p>
+<h4 id="neural-network-feature-importance">Neural Network Feature Importance</h4>
+<p><img src="/capstone-project/lstm_features.png" alt="Neural Network Feature Importance"></p>
+<p>We get similar results to that of the xgb model, which makes us feel like further improvements should come from the hand of a better preproccesing probably, working with outliers and incorrect data in a more detailed way. On the other hand, we see that in this case the weather variables have a lot more weight than in the xgb model, which is what we expected to happen in the first place, but the first two models didn&rsquo;t show.</p>
 <h2 id="heatmap-and-buffer-analysis">Heatmap and Buffer Analysis</h2>
-<p>This section consists in two parts:</p>
+<p>This last section consists in two parts:</p>
 <ul>
 <li>
 <p>Creation of a dinamic heat map of dock availability that can be changed based on the month and year parameter. This will allow us to understand the pattern of bicycle usage across the city.</p>
@@ -416,28 +366,7 @@ The flow has two sub-flows because is necessary applied the same process to bici
 <p>Performance of a buffer analysis. Here we are going to search for areas that are near the bike lanes but do not have a nearby bike station to detect potential zones where new bike stations could be installed. The buffer has been set in 500 meters based on the size of the city and the number of stations.</p>
 </li>
 </ul>
-<h3 id="a-libraries">a. Libraries</h3>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#f92672">import</span> folium
-</span></span><span style="display:flex;"><span><span style="color:#f92672">from</span> folium.plugins <span style="color:#f92672">import</span> HeatMap
-</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> pandas <span style="color:#66d9ef">as</span> pd
-</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> json
-</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> numpy <span style="color:#66d9ef">as</span> np
-</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> dask.dataframe <span style="color:#66d9ef">as</span> dd
-</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> dash
-</span></span><span style="display:flex;"><span><span style="color:#f92672">from</span> dash.dependencies <span style="color:#f92672">import</span> Input, Output
-</span></span><span style="display:flex;"><span><span style="color:#f92672">from</span> dash <span style="color:#f92672">import</span> dcc <span style="color:#66d9ef">as</span> dcc
-</span></span><span style="display:flex;"><span><span style="color:#f92672">from</span> dash <span style="color:#f92672">import</span> html <span style="color:#66d9ef">as</span> html
-</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> base64
-</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> os
-</span></span><span style="display:flex;"><span><span style="color:#f92672">from</span> flask <span style="color:#f92672">import</span> Flask
-</span></span><span style="display:flex;"><span><span style="color:#f92672">from</span> io <span style="color:#f92672">import</span> BytesIO
-</span></span><span style="display:flex;"><span><span style="color:#f92672">from</span> jupyter_dash <span style="color:#f92672">import</span> JupyterDash
-</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> geopandas <span style="color:#66d9ef">as</span> gpd
-</span></span><span style="display:flex;"><span><span style="color:#f92672">from</span> shapely.geometry <span style="color:#f92672">import</span> LineString
-</span></span><span style="display:flex;"><span><span style="color:#f92672">from</span> shapely.geometry <span style="color:#f92672">import</span> Point, Polygon
-</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> geopy.distance
-</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> math
-</span></span></code></pre></div><h3 id="b-heatmap">b. Heatmap</h3>
+<h3 id="a-heatmap">a. Heatmap</h3>
 <p>The code is designed to generate and display the dinamic heatmap that represents the average availability of bike docks across the city, given a specific month and year.First, lets create a joined dataframe that will be used for the heatmap analysis</p>
 <p><img src="/capstone-project/heatmap-dataframe.png" alt="Heatmap Dataframe"></p>
 <p>Now we are going to calculate the average percentage of bike availability at each station using the historical data. then we will generate a heatmap based on this data, with coordinates of each station and a color intensity indicating the level of bike availability. This heatmap is overlaid onto the city map created using Folium, providing a clear visualization of bike availability in different areas of the city.</p>
@@ -445,7 +374,7 @@ The flow has two sub-flows because is necessary applied the same process to bici
 <p><img src="/capstone-project/bicing-heatmap-capture.png" alt="Heatmap"></p>
 <p><img src="/capstone-project/bicing-heatmap-capture2.png" alt="Heatmap2"></p>
 <p>Remarks: If we compare the different periods, we can see that in general, the downtown is the area where there is a major use of bicycle and therefore less availability.</p>
-<h3 id="c-buffer-analysis">c. Buffer Analysis</h3>
+<h3 id="b-buffer-analysis">b. Buffer Analysis</h3>
 <p>This produces a heatmap representing the average availability of bikes at different stations in march 2023 including the buffer analysis around bike lanes.</p>
 <p>First, we define a function function to calculate the geographical distance between two points on Earth given their latitude and longitude. This function will be later used in the buffer analysis.</p>
 <p>Next, we compute the average availability of bikes at each station for march 2023. This data is used to create a list of tuples where each tuple contains the latitude, longitude and availability of a bike station. The bike availability is subtracted from 1 to display lack of availability in the heatmap.</p>
@@ -491,23 +420,20 @@ The flow has two sub-flows because is necessary applied the same process to bici
     <nav id="toc">
         <nav id="TableOfContents">
   <ul>
-    <li><a href="#whats-bicing-">What&rsquo;s Bicing ?</a></li>
-    <li><a href="#goal">Goal</a></li>
-    <li><a href="#get-the-data">Get the Data</a>
+    <li><a href="#introduction">Introduction</a></li>
+    <li><a href="#gathering-the-data">Gathering the Data</a>
       <ul>
-        <li><a href="#a-download-the-data">a. Download the Data</a></li>
-        <li><a href="#b-consolidate-the-data">b. Consolidate the Data</a></li>
+        <li><a href="#b-data-merging">b. Data merging</a></li>
       </ul>
     </li>
-    <li><a href="#discover-and-visualize-the-data-to-gain-insights">Discover and visualize the data to gain insights</a>
+    <li><a href="#data-exploration">Data exploration</a>
       <ul>
         <li><a href="#a-tableau-workflow">a. Tableau Workflow</a></li>
-        <li><a href="#b-analysis-in-tableau">b. Analysis in Tableau</a></li>
+        <li><a href="#b-visual-analysis-in-tableau">b. Visual Analysis in Tableau</a></li>
       </ul>
     </li>
     <li><a href="#prepare-the-data-for-machine-learning-algorithms">Prepare the data for Machine Learning algorithms</a>
       <ul>
-        <li><a href="#a-importation-of-data-in-colab">a. Importation of data in Colab</a></li>
         <li><a href="#b-data-cleaning-and-filtering">b. Data Cleaning and Filtering</a></li>
         <li><a href="#c-processing-pipelines">c. Processing pipelines</a></li>
         <li><a href="#d-classes-and-functions">d. Classes and Functions</a></li>
@@ -522,9 +448,8 @@ The flow has two sub-flows because is necessary applied the same process to bici
     </li>
     <li><a href="#heatmap-and-buffer-analysis">Heatmap and Buffer Analysis</a>
       <ul>
-        <li><a href="#a-libraries">a. Libraries</a></li>
-        <li><a href="#b-heatmap">b. Heatmap</a></li>
-        <li><a href="#c-buffer-analysis">c. Buffer Analysis</a></li>
+        <li><a href="#a-heatmap">a. Heatmap</a></li>
+        <li><a href="#b-buffer-analysis">b. Buffer Analysis</a></li>
       </ul>
     </li>
   </ul>
