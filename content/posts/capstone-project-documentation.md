@@ -822,7 +822,7 @@ This produces a heatmap representing the average availability of bikes at differ
 
 First, we define a function function to calculate the geographical distance between two points on Earth given their latitude and longitude. This function will be later used in the buffer analysis.
 
-Next, we compute the average availability of bikes at each station for march 2023. This data is used to create a list of tuples where each tuple contains the latitude, longitude, and availability of a bike station. The bike availability is subtracted from 1 to display lack of availability in the heatmap.
+Next, we compute the average availability of bikes at each station for march 2023. This data is used to create a list of tuples where each tuple contains the latitude, longitude and availability of a bike station. The bike availability is subtracted from 1 to display lack of availability in the heatmap.
 
 A base map of the city is created using Folium and the bike lanes data is loaded from a GeoJSON file and added to the map.The heatmap is added to the map using the previously computed bike station data.
 
