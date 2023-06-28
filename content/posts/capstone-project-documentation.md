@@ -247,60 +247,46 @@ xgb_model2 = XGBRegressor(objective='reg:squarederror',
 ```
 Obtaining a slightly lower final rmse score (0.1019 vs 0.1100) and the following dfeature imporances and loss evolution curves:
 
-![Loss Function graphic](/static/xgb_loss2.png)
-![Feature Importances Graphic](/capstone-project/feature-importance-xgboost2.png)
+![Loss Function graphic](/capstone-project/xgb_loss2.png)
+![Feature Importances Graphic](/capstone-project/xgb2_features.png)
+
+Which in this case show quite a bit more overfitting due to the complexity of the model and also more relevance given to the location of the stations. The temperature now also appears in the feature importance plot, but still not the rain.
+
 ### b. LSTM
 
 Apart from our xgbregressor model, and since our data contains historical data, we have also tried to study the prediction problem as a time-series analysis by working with long short-term memory layers on a neural network to try and exploit the temporal ordering of the information. Since not all the variables are historical, that have built a time series with just the one that are historical context, and we have treated the rest with a fully connected network. By using this approach our intention is to capture not only the static context of the data, but also the past that leads to each station's state.
 
-We construct a neural network by separating it into two parts, one for the time series data and one for the static data. The time series data is fed into an LSTM layer, the static data is fed into a dense layer
+To operate with the two groups of data, the nework starts off with 2 LSTM layers and a dense network that work in parallel and that process the temporal data and static data, respectively. After this, the outputs are concatenated and passed thorugh 3 final dense layers that lead to a single neuron with a sigmoid activation function that returns a value between 0 and 1.
+We have also added droupout layers to prevent overfitting (we will see that that is a problem with this model)
 
 
 #### Neural Network Structure
 
 ![Neural Network](/capstone-project/neural-network-structure.png)
 
+![Neural Network](/capstone-project/lstm_structure.png)
+
 #### Neural Network Results
 
-![Neural Network Results](/capstone-project/neural-network-results.png)
+![Neural Network Results](/capstone-project/lstm_loss.png)
+
+#### Neural Network Feature Importance
+
+![Neural Network Feature Importance](/capstone-project/lstm_features.png)
 
 
-We get recall similar results to that of the xgb model --> Further improvements should come from the hand of a better preproccesing probably, working with outliers and incorrect data in a more detailed way
+We get similar results to that of the xgb model, which makes us feel like further improvements should come from the hand of a better preproccesing probably, working with outliers and incorrect data in a more detailed way. On the other hand, we see that in this case the weather variables have a lot more weight than in the xgb model, which is what we expected to happen in the first place, but the first two models didn't show.
 
 ## Heatmap and Buffer Analysis
 
-This section consists in two parts:
+This last section consists in two parts:
 
 - Creation of a dinamic heat map of dock availability that can be changed based on the month and year parameter. This will allow us to understand the pattern of bicycle usage across the city.
 
 - Performance of a buffer analysis. Here we are going to search for areas that are near the bike lanes but do not have a nearby bike station to detect potential zones where new bike stations could be installed. The buffer has been set in 500 meters based on the size of the city and the number of stations.
 
-### a. Libraries
 
-```python
-import folium
-from folium.plugins import HeatMap
-import pandas as pd
-import json
-import numpy as np
-import dask.dataframe as dd
-import dash
-from dash.dependencies import Input, Output
-from dash import dcc as dcc
-from dash import html as html
-import base64
-import os
-from flask import Flask
-from io import BytesIO
-from jupyter_dash import JupyterDash
-import geopandas as gpd
-from shapely.geometry import LineString
-from shapely.geometry import Point, Polygon
-import geopy.distance
-import math
-
-```
-### b. Heatmap
+### a. Heatmap
 
 The code is designed to generate and display the dinamic heatmap that represents the average availability of bike docks across the city, given a specific month and year.First, lets create a joined dataframe that will be used for the heatmap analysis
 
@@ -318,7 +304,7 @@ The resulting map is saved as an HTML file in a temporary location and then the 
 
 Remarks: If we compare the different periods, we can see that in general, the downtown is the area where there is a major use of bicycle and therefore less availability.
 
-### c. Buffer Analysis
+### b. Buffer Analysis
 
 This produces a heatmap representing the average availability of bikes at different stations in march 2023 including the buffer analysis around bike lanes.
 
