@@ -8,11 +8,13 @@ type: post
 showTableOfContents: true
 ---
 
-## What's Bicing ?
+## Introduction
+
+The Bicing service, since its start in 2007, has become a great way to move around the city, leveraging the great bike lane network of the city. Thhroughout the years
 
 The new Bicing service includes more territorial coverage, an increase in the number of bicycles, mixed stations for conventional and electric bicycles, new and improved types of stations and bicycles (safety, anchorage, comfort), extended schedules and much more!
 
-## Goal
+## Goals of the project
 
 There are two main objective in this project:
 
