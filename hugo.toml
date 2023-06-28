@@ -10,7 +10,6 @@ tag = "tags"
 category = "categories"
 
 [params]
-  showPostsOnHomePage = "popular"
   footer = "The Cyclists"
   description = "Data Science & Machine Learning Final Project"
 
