@@ -248,6 +248,9 @@ xgb_model2 = XGBRegressor(objective='reg:squarederror',
 Obtaining a slightly lower final rmse score (0.1019 vs 0.1100) and the following dfeature imporances and loss evolution curves:
 
 ![Loss Function graphic](/capstone-project/xgb_loss2.png)
+
+
+
 ![Feature Importances Graphic](/capstone-project/xgb2_features.png)
 
 Which in this case show quite a bit more overfitting due to the complexity of the model and also more relevance given to the location of the stations. The temperature now also appears in the feature importance plot, but still not the rain.
@@ -301,6 +304,8 @@ The resulting map is saved as an HTML file in a temporary location and then the 
 
 ![Heatmap2](/capstone-project/bicing-heatmap-capture2.png)
 
+Where the interactive version can be found in the notebook, when running the cells corresponding to this section at the end using Colab
+
 
 Remarks: If we compare the different periods, we can see that in general, the downtown is the area where there is a major use of bicycle and therefore less availability.
 
@@ -317,6 +322,10 @@ A base map of the city is created using Folium and the bike lanes data is loaded
 The script then performs the buffer analysis. It iterates through each bike lane segment and checks if it's more than 500 meters away from any bike station. If it is, a marker is added to that point on the map. This analysis helps identify undeserved areas where additional bike stations might be needed. Then is saved as an html.
 
 The output is the following:
+
+[Heatmap](/capstone-project/map_marker.png)
+
+Or you can see it in the following html link:
 
 [Buffer Analysis](/capstone-project/temp_map_no_mark23.html)
 
