@@ -8,43 +8,22 @@ type: post
 showTableOfContents: true
 ---
 
-## What's Bicing ?
+Gokarna is an opinionated theme with a focus on minimalism and simplicity.
 
-The new Bicing service includes more territorial coverage, an increase in the number of bicycles, mixed stations for conventional and electric bicycles, new and improved types of stations and bicycles (safety, anchorage, comfort), extended schedules and much more!
+## Installation
 
-## Goal
+The following steps are here to help you initialize your new website. If you don’t know Hugo at all, we strongly suggest you learn more about it by following this [great documentation for beginners](https://gohugo.io/getting-started/quick-start/).
 
-There are two main objective in this project:
+### a. Create Your Project
 
-- Predict the number of free docks given the historical data (Docks Availability Percent).
-
-- Explore new places where stations are needed.
-
-- Explore how different events affect availability.
-
-
-## Get the Data
-
-The Bicing stations status and information of the city of Barcelona were downloaded from [Open Data BCN](https://opendata-ajuntament.barcelona.cat)
-
-### a. Download the Data
-
-The following script was used to download the data by year and month:
+Hugo provides a `new` command to create a new website:
 
 ```bash
-import os
-
-i2m = list(zip(range(1,13), ['Gener','Febrer','Marc','Abril','Maig','Juny','Juliol','Agost','Setembre','Octubre','Novembre','Desembre']))
-for year in [2022, 2021, 2020, 2019]:
-    for month, month_name in i2m:        
-        os.system(f"wget 'https://opendata-ajuntament.barcelona.cat/resources/bcn/BicingBCN/{year}_{month:02d}_{month_name}_BicingNou_ESTACIONS.7z'")
-        os.system(f"7z x '{year}_{month:02d}_{month_name}_BicingNou_ESTACIONS.7z'")
-        os.system(f"rm '{year}_{month:02d}_{month_name}_BicingNou_ESTACIONS.7z'")
-
+hugo new site my_website
+cd my_website
 ```
 
-
-
+### b. Install the Theme
 
 The theme’s repository is: [https://github.com/526avijitgupta/gokarna](https://github.com/526avijitgupta/gokarna).
 
