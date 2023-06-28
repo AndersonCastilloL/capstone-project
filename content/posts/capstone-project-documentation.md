@@ -8,13 +8,11 @@ type: post
 showTableOfContents: true
 ---
 
-## Introduction
-
-The Bicing service, since its start in 2007, has become a great way to move around the city, leveraging the great bike lane network of the city. Thhroughout the years
+## What's Bicing ?
 
 The new Bicing service includes more territorial coverage, an increase in the number of bicycles, mixed stations for conventional and electric bicycles, new and improved types of stations and bicycles (safety, anchorage, comfort), extended schedules and much more!
 
-## Goals of the project
+## Goal
 
 There are two main objective in this project:
 
@@ -37,7 +35,7 @@ The Bicing stations status and information of the city of Barcelona were downloa
 
 ### a. Download the Data
 
-The following script was used to download the data of [Open Data BCN](https://opendata-ajuntament.barcelona.cat) by year and month:
+The following script was used to download the data from [Open Data BCN](https://opendata-ajuntament.barcelona.cat) by year and month:
 
 ```bash
 import os
@@ -51,7 +49,7 @@ for year in [2022, 2021, 2020, 2019]:
 
 ```
 
-The following script was used to download the data of [Meteo Cat](https://www.meteo.cat) to join and use in the patterns of the availability to the stations:
+The following script was used to download the data from [Meteo Cat](https://www.meteo.cat) and integrate it into the station availability patterns
 
 ```python
 # CODE TO RETRIEVE DATA FROM THE WEATHER API AND STORE IT IN A CSV FILE
@@ -156,386 +154,90 @@ With all the consolidate information we start to clean and processes the data to
 
 ### a. Importation of data in Colab
 
-Importation of Bicing Data and Weather of our Tableau workflow and meteo script in python
+We load the dataframes of bicing station (validation and training), weather and testing.
 
 ```python
-
-import dask.dataframe as dd
-import pandas as pd
-import numpy as np
-from sklearn.preprocessing import FunctionTransformer
-from dask_ml.preprocessing import StandardScaler, MinMaxScaler
-from dask_ml.impute import SimpleImputer
-from sklearn.pipeline import Pipeline
-from sklearn.impute import SimpleImputer
-from sklearn.compose import ColumnTransformer
-from sklearn.base import BaseEstimator, TransformerMixin
-from IPython.display import Markdown
-import json
-
-####################################################################################################
-# To run in colab
-
 station_dataframe = dd.read_csv('/content/drive/MyDrive/CapstoneProject/data_bicing_joined_HX_23.csv', assume_missing=True, delimiter=';')
 
 weather_dataframe = dd.read_csv('/content/drive/MyDrive/CapstoneProject/weather.csv', assume_missing=True, delimiter=',')
 
 data_2_predict = dd.read_csv('/content/drive/MyDrive/CapstoneProject/metadata_sample_submission.csv', delimiter=',')
 
-####################################################################################################
-
 ```
 ### b. Data Cleaning and Filtering
 
-- Initial cleaning to go from the format that the Tableau merger outputs to the one desired for the model
-- The objective of this first step is to leave the training data in the same format as the submission one
-- Drop all rows with out of service stations and year 2020, to avoid COVID effects on our training data
-
-```python
-
-station_dataframe = station_dataframe.loc[station_dataframe['status'] == 'IN_SERVICE']
-
-##################################################################################################
-
-train_df = station_dataframe.loc[(station_dataframe['year'] != 2020) & (station_dataframe['year'] != 2023)]
-
-train_df = train_df[['station_id', 'lat', 'lon', 'year', 'month', 'day', 'hour', '% Docks Availlable',  '% Docks Available H-4','% Docks Available H-3', '% Docks Available H-2', '% Docks Available H-1']]
-train_df = train_df.rename(columns={'% Docks Availlable': 'percentage'})
-for i in range(1, 5):
-    train_df = train_df.rename(columns={f'% Docks Available H-{i}': f'ctx-{i}'})
-
-# Print the head of the updated DataFrame
-train_df = train_df[['station_id', 'lat', 'lon', 'year', 'month', 'day', 'hour', 'ctx-4', 'ctx-3', 'ctx-2',	'ctx-1', 'percentage']]
-
-train_df = train_df.reset_index()
-
-##################################################################################################
-
-validation_df = station_dataframe.loc[(station_dataframe['year'] == 2023)]
-
-validation_df = validation_df[['station_id', 'lat', 'lon', 'year', 'month', 'day', 'hour', '% Docks Availlable',  '% Docks Available H-4','% Docks Available H-3', '% Docks Available H-2', '% Docks Available H-1']]
-validation_df = validation_df.rename(columns={'% Docks Availlable': 'percentage'})
-for i in range(1, 5):
-    validation_df = validation_df.rename(columns={f'% Docks Available H-{i}': f'ctx-{i}'})
-
-# Print the head of the updated DataFrame
-validation_df = validation_df[['station_id', 'lat', 'lon', 'year', 'month', 'day', 'hour', 'ctx-4', 'ctx-3', 'ctx-2',	'ctx-1', 'percentage']]
-
-validation_df = validation_df.reset_index()
-
-
-```
+- Initial cleaning to go from the format that the Tableau merger outputs to the one desired for the model.
+- The objective of this first step is to leave the training data in the same format as the submission one.
+- Drop all rows with out of service stations and year 2020, to avoid COVID effects on our training data.
+- Select the features with the highest relevance (station_id, lat, lon, year, month, day, hour, ctx-4, ctx-3, ctx-2, ctx-1, percentage).
+- Split the data into training and validation.
+- Filter only the data with status "IN_SERVICE".
 
 ### c. Processing pipelines
 
 Apart from the preprocessing done using tableau to create the initial dataframe, everything else will be done using sklearn pipelines. 
 
-Creation of the 3 pipelines:
-- train_preparator: to prepare the training data, not used for the submission data as we already have location data
-- submisison_preparator: to prepare the submission data, not used for the training data as we don't have location data --> Not a problem since we are not fitting to any data, just transforming with data we already have
-- scaling_pipeline: to fill and scale certain column in the data, used for both training and submission data --> In this case, we are fitting to the training data, and transforming both training and submission data
+Creation of the 4 pipelines:
+- train_preparator: 
+  - to prepare the training data, not used for the submission data as we already have location data.
+  - we have five transformers. The first merge the data with weather dataframe and include the creation of the datatime column.
+  - the second transform add new columns of time.
+  - the third and fourth transformer filter the hours to avoid overlapping and normalize datetime columnes like month, day, hour and year.
+  
+- submisison_preparator and val_preparator: 
+  - to prepare the submission data, not used for the training data as we don't have location data. Not a problem since we are not fitting to any data, just transforming with data we already have
+  - we keep the same transformers of the previous pipeline because we want to have the same structure with the data.
+  
+- scaling_pipeline: 
+  - to fill and scale certain column in the data, used for both training and submission data. In this case, we are fitting to the training data, and transforming both training and submission data
 
-
-```python
-
-train_preparator = Pipeline([
-    ('weather_merge', weather_merge_transformer(weather_df=weather_prepped)),  # weather_merge transformer already includes the creation of the datetime column
-    ('extra_time_info', FunctionTransformer(func=extra_time_info)),
-    ('hour_selector', hour_selector_transformer(hour_list=[4, 9, 14, 19, 23])), # This obviously restricts the training set, but it prevents
-                                                                                # the model from seeing data labels before predicting them afterwards
-                                                                                # It also prevents running out of RAM. A better approach would need to sample all
-                                                                                # all hours, but it is quite more complicated than this
-
-    ('time_normalization', time_norm_transformer(columns=['month', 'day', 'hour'])),
-    ('station_id_dropper', station_id_dropper())
-])
-
-val_preparator = Pipeline([
-    ('weather_merge', weather_merge_transformer(weather_df=weather_prepped)),  # weather_merge transformer already includes the creation of the datetime column
-    ('extra_time_info', FunctionTransformer(func=extra_time_info)),
-    ('hour_selector', hour_selector_transformer(hour_list=[i for i in range(24)])), # For the validation part, we will leave one dataset with all the hours and another one
-                                                                                    # with just the four that appear in the training set to evaluate how this decision affects results
-    ('time_normalization', time_norm_transformer(columns=['month', 'day', 'hour'])),
-    ('station_id_dropper', station_id_dropper())
-])
-
-submission_preparator = Pipeline([
-    ('weather_merge', weather_merge_transformer(weather_df=weather_prepped)),  # weather_merge transformer already includes the creation of the datetime column'
-    ('extra_time_info', FunctionTransformer(func=extra_time_info)),
-    ('hour_selector', hour_selector_transformer(hour_list=[i for i in range(24)])),
-    ('time_normalization', time_norm_transformer(columns=['month', 'day', 'hour'])),
-    ('station_loc', station_loc_transformer(id_lat_lon=final_loc)),
-    ('station_id_dropper', station_id_dropper())
-])
-
-
-
-total_columns = ['index','lat', 'lon', 'ctx-4', 'ctx-3', 'ctx-2', 'ctx-1',
-       'temperature', 'mm_precip', 'temperature-1', 'mm_precip-1',
-       'temperature-2', 'mm_precip-2', 'temperature-3', 'mm_precip-3',
-       'temperature-4', 'mm_precip-4', 'is_weekend', 'timeframe1',
-       'timeframe2', 'timeframe3', 'timeframe4', 'timeframe5', 'cos_month',
-       'sin_month', 'cos_day', 'sin_day', 'cos_hour', 'sin_hour',
-       'year_normed']
-
-
-to_fill = ['index', 'ctx-4', 'ctx-3', 'ctx-2', 'ctx-1', 'is_weekend', 'timeframe1',
-                   'timeframe2', 'timeframe3', 'timeframe4', 'timeframe5', 'cos_month',
-                   'sin_month', 'cos_day', 'sin_day', 'cos_hour', 'sin_hour',
-                   'year_normed']
-
-
-to_fill_and_scale = ['lat', 'lon', 'temperature', 'mm_precip', 'temperature-1', 'mm_precip-1',
-       'temperature-2', 'mm_precip-2', 'temperature-3', 'mm_precip-3',
-       'temperature-4', 'mm_precip-4']
-
-
-filler = Pipeline([
-    ('nan_filler', SimpleImputer(missing_values = np.nan, strategy='median'))
-])
-
-filler_scaler= Pipeline([
-    ('nan_filler', SimpleImputer(missing_values = np.nan, strategy='median')),
-    ('min_max', MinMaxScaler(feature_range = (-1,1)))
-])
-
-scaling_pipeline = ColumnTransformer([
-    ('fill', filler, to_fill),
-    ('fill_scale', filler_scaler, to_fill_and_scale)
-])
-
-```
 
 ### d. Classes and Functions
 
-Each pipeline is support by a set of functions and classes to structure the data and features
+Each pipeline is supported by a set of functions and classes to structure the data and features. The functions are included like parameters inside of the classes.
+
+#### Functions
+
+- extra_time_info: add new columns of time like is_weekend, timeframe1, timeframe2, timeframe3, timeframe4, timeframe5 to group the hours
+- hour_selector: filter a range of hours to avoid overlapping with the columns with the same information of one to four hours before
+- time_norm: Time normalizer function to normalize the time columns to a 0-1 scale with periodicity. This is done by applying a sin and cos transformation to the columns
+- weather_prep: 
+  - weather dataframe preparator to leave it in the desired format to merge with the station dataframe.
+  - We convert the half hourly data to hourly data by averaging temperature and summing precipitation
+  - We also add a column with the datetime in order to merge the dataframes
+- weather_merge: Merge the main dataframe with weather dataframe and split datetime column in year, month, day and hour
+
+#### Classes
+
+- hour_selector_transformer: class to encapsulate the range of hours.
+- station_loc_transformer: class to join and encapsulate the latitude and longitude.
+- station_id_dropper: the class use station id dropper function to drop the station_id column from the dataset at the end of the pipeline. The prediction will be done on the location of the stations, not on the id.
+- time_norm_transformer: class to encapsulate a time columns and normalize them using time_norm function.
+- weather_merge_transformer: class to encapsulate the weather data and merge with main dataframe.
 
-```python
-
-def weather_prep(weather_df:dd) -> dd:
-
-    # weather dataframe preparator to leave it in the desired format to merge with the station dataframe
-    # We convert the half hourly data to hourly data by averaging temperature and summing precipitation
-    # We also add a column with the datetime in order to merge the dataframes
-
-    weather = weather_df.copy()
-
-    weather = weather.groupby(weather.index//2).mean()
-
-    weather['mm_precip'] = weather['mm_precip']*2
-    weather['timestamp'] = (weather['timestamp']-900).astype(int)
-    weather['datetime'] = weather['timestamp'].map(lambda x: pd.to_datetime(x, unit='s'))
-
-
-    weather['timestamp'] = weather['timestamp'].astype(int)
-
-    weather['datetime'] = weather['timestamp'].map(lambda x: pd.to_datetime(x, unit='s'))
-
-    weather = weather.drop_duplicates(subset=['timestamp'])
-
-    return weather
-
-def weather_merge(weather_df: dd, station_data: dd) -> dd:
-    weather = weather_df.copy().compute()
-    stations = station_data.copy().compute()
-
-    if 'year' not in stations.columns:  # the submission df does not contain year, and we need will use that to predict
-        stations['year'] = 2023
-
-    stations[['year', 'month', 'day', 'hour']] = stations[['year', 'month', 'day', 'hour']].astype(int)
-
-    stations['datetime'] = pd.to_datetime(stations['year'].astype(str) + '-' +
-                                        stations['month'].astype(str) + '-' +
-                                        stations['day'].astype(str) + ' ' +
-                                        stations['hour'].astype(str) + ':00:00')
-
-    weather['datetime'] = pd.to_datetime(weather['datetime'])
-
-    # Sorting dataframes by datetime for the asof merge
-    weather = weather.sort_values('datetime')
-    stations = stations.sort_values('datetime')
-
-    # Merge for the current datetime
-    stations = pd.merge_asof(stations, weather[['datetime', 'temperature', 'mm_precip']], left_on='datetime', right_on='datetime', direction='backward')
-
-    # Iterate to merge for the preceding datetimes
-    for i in range(1, 5):
-        df_weather_shifted = weather.copy()
-        df_weather_shifted['datetime'] += pd.Timedelta(hours=i) # shift weather data i hours forward
-        stations = pd.merge_asof(stations, df_weather_shifted[['datetime', 'temperature', 'mm_precip']], left_on='datetime', right_on='datetime', direction='backward', suffixes=('', f'-{i}'))
-
-    return dd.from_pandas(stations, npartitions=5)  # Convert back to Dask DataFrame
-
-
-####################################################################################################
-####################################################################################################
-
-class weather_merge_transformer(BaseEstimator, TransformerMixin):
-    def __init__(self, weather_df:dd, merging_function:callable=weather_merge):
-        self.weather_df = weather_df
-        self.func = merging_function
-
-    def fit(self, X, y=None):
-        return self
-
-    def transform(self, X):
-        return self.func(self.weather_df, X)
-
-####################################################################################################
-
-
-def extra_time_info(df:dd) -> dd:
-
-    def is_weekend(day_of_week):
-        return 1 if day_of_week >= 5 else 0
-
-    # Create a column to distinguish id ii's a weekend or not
-    df['is_weekend'] = df['datetime'].dt.dayofweek.map(is_weekend, meta=('is_weekend', 'int64'))
-
-    # Since we will only be working with 5 hours, we add 5 binary columns to indicate in which part of the day we are
-    # to sort of solve the problem of the missing hours for training
-
-    df['timeframe1'] = df['datetime'].dt.hour.map(lambda x: 1 if x <= 4 else 0, meta=('timeframe1', 'int64'))
-    df['timeframe2'] = df['datetime'].dt.hour.map(lambda x: 1 if x >= 5 and x <=9 else 0, meta=('timeframe1', 'int64'))
-    df['timeframe3'] = df['datetime'].dt.hour.map(lambda x: 1 if x >= 10 and x <=14 else 0, meta=('timeframe1', 'int64'))
-    df['timeframe4'] = df['datetime'].dt.hour.map(lambda x: 1 if x >= 15 and x <=19 else 0, meta=('timeframe1', 'int64'))
-    df['timeframe5'] = df['datetime'].dt.hour.map(lambda x: 1 if x >= 20 else 0, meta=('timeframe1', 'int64'))
-
-    df = df.drop(['datetime'], axis = 1)
-
-    return df
-
-####################################################################################################
-
-
-def station_loc(id_lat_lon:dd, df:dd) -> dd: #this should be applied for the 2023 march dataset to predict from station_id-location paris from february 2023
-
-    # station location adder from the february 2023 dataset to substitute station_id for locations
-
-    assert all(item in list(id_lat_lon.columns) for item in ['station_id', 'lat', 'lon']), 'id_lat_lon must contain station_id, lat and lon columns'
-    id_locator = id_lat_lon.copy()
-    data = df.copy()
-    id_locator = id_locator.drop_duplicates(subset=['station_id'])
-
-    data = data.merge(id_locator[['station_id', 'lat', 'lon']], on='station_id', how='left')
-
-    return data
-
-class station_loc_transformer(BaseEstimator, TransformerMixin):
-    def __init__(self, id_lat_lon:dd, merging_function:callable=station_loc):
-        self.id_lat_lon = id_lat_lon
-        self.func = merging_function
-
-    def fit(self, X, y=None):
-        return self
-
-    def transform(self, X):
-        return self.func(self.id_lat_lon, X)
-
-####################################################################################################
-
-
-
-def hour_selector(df:dd, hour_list:list) -> dd:
-
-    # Hour selector function to select only the hours we want to train on
-    # in our case we will only train on 5 hours of the day, but a more complicated function
-    # that would cover all hours could also be constructed
-
-    data = df.copy()
-    data = data.loc[data['hour'].isin(hour_list)]
-    return data
-
-class hour_selector_transformer(BaseEstimator, TransformerMixin):
-    def __init__(self, hour_list:list):
-        self.hour_list = hour_list
-
-    def fit(self, X, y=None):
-        return self
-
-    def transform(self, X):
-        return hour_selector(X, self.hour_list)
-
-####################################################################################################
-
-
-def time_norm(df:dd, columns:list) -> dd:
-    # Time normalizer function to normalize the time columns to a 0-1 scale with periodicity
-    # This is done by applying a sin and cos transformation to the columns
-
-    data = df.copy()
-    for col in columns:
-        data['cos_'+col] = np.cos(2*np.pi*data[col]/data[col].max())
-        data['sin_'+col] = np.sin(2*np.pi*data[col]/data[col].max())
-        data = data.drop([col], axis=1)
-
-    data['year_normed'] = (data['year']-2019)/4
-    data = data.drop(['year'], axis = 1)
-
-    return data
-
-class time_norm_transformer(BaseEstimator, TransformerMixin):
-    def __init__(self, columns: list, norm_function: callable=time_norm):
-        self.columns = columns
-        self.func = norm_function
-
-    def fit(self, X, y=None):
-        return self
-
-    def transform(self, X):
-        return self.func(X, self.columns)
-
-####################################################################################################
-
-class station_id_dropper(BaseEstimator, TransformerMixin):
-
-    # Station id dropper function to drop the station_id column from the dataset at the end of the pipeline
-    # prediction will be done on the location of the stations, not on the id
-
-    def fit(self, X, y=None):
-        return self
-    def transform(self, X):
-        return X.drop(['station_id'], axis=1)
-		
-```
 
 ### e. Prepare all data and load data that has been saved
 
 The following code load the data has been saved in the prepped_data folder, so there is no need to run this code again. We will just load it from our folder to work with the models
 
-We have 3 datasets. The first is to train, the second consider only a range of hours to not overlap the data with the columns and the last dataset is our test which is loaded in Kaggle
+We have three datasets. The first dataset is for training purposes, the second dataset considers only a specific range of hours to avoid overlapping data with the columns, and the last dataset is our test dataset, which is loaded on Kaggle.
 
-```python
 
-X_submission = pd.read_csv('/content/drive/MyDrive/CapstoneProject/prepped_data/X_submission.csv')
-X_train = pd.read_csv('/content/drive/MyDrive/CapstoneProject/prepped_data/X_train.csv', delimiter = ',').drop('index', axis = 1)
-y_train = pd.read_csv('/content/drive/MyDrive/CapstoneProject/prepped_data/y_train.csv', delimiter = ',')
+- Training Dataset
 
-# Validation taked 5 hours
-X_val = pd.read_csv('/content/drive/MyDrive/CapstoneProject/prepped_data/X_val.csv', delimiter = ',').drop('index', axis = 1)
-y_val = pd.read_csv('/content/drive/MyDrive/CapstoneProject/prepped_data/y_val.csv', delimiter = ',')
+  ![X-Train dataset](/capstone-project/x-train.png)
 
-# Validation taked 24 hours
-X_val24 = pd.read_csv('/content/drive/MyDrive/CapstoneProject/prepped_data/X_val24.csv', delimiter = ',').drop('index', axis = 1)
-y_val24 = pd.read_csv('/content/drive/MyDrive/CapstoneProject/prepped_data/y_val24.csv', delimiter = ',')
+- Validation Dataset (5 hr)
 
-```
+  ![X-Val dataset](/capstone-project/x-val.png)
 
-#### Training Dataset
+- Validation Dataset with all hours (24 hr)
 
-![X-Train dataset](/capstone-project/x-train.png)
+  ![X-Val24 dataset](/capstone-project/x-val24.png)
 
-#### Validation Dataset (5 hr)
+- Submission Dataset (Testing Dataset)
 
-![X-Val dataset](/capstone-project/x-val.png)
-
-#### Validation Dataset with all hours (24 hr)
-
-![X-Val24 dataset](/capstone-project/x-val24.png)
-
-#### Submission Dataset (Testing Dataset)
-
-![X-Submission dataset](/capstone-project/x-submission.png)
+  ![X-Submission dataset](/capstone-project/x-submission.png)
 
 ## Model Selection and Training
 
@@ -547,23 +249,9 @@ We will first use a data subset to perform a grid search on the parameter space 
  
 #### RandomizedSearchCV and GridSearchCV
 
-We apply both techniques to find the best parameters to our model after to transform our data with the pipelines
+We apply both techniques to find the best parameters for our model after transforming our data using pipelines. We use an XGBRegressor and a set of parameters associated with it to evaluate the optimal parameters for training and prediction.
 
 ```python
-
-import xgboost as xgb
-from xgboost import XGBRegressor
-from sklearn.metrics import mean_squared_error
-import json
-from sklearn.model_selection import RandomizedSearchCV, GridSearchCV
-
-from sklearn.model_selection import RandomizedSearchCV, GridSearchCV
-
-gs_subset = X_train[X_train['year_normed'] == 0.75].sample(frac = 0.005, random_state = 5) # to restrict ourselves to more relevant data, we focus on 2022
-
-y_subset = y_train.loc[gs_subset.index]
-
-
 space = {
     'learning_rate': [0.1, 0.01, 0.001],
     'max_depth': [3, 5, 7],
@@ -629,130 +317,8 @@ The feature important plot is really interesting. From it we can conclude that:
 
 Apart from our xgbregressor model, and since our data contains historical data, we have also tried to study the prediction problem as a time-series analysis by working with long short-term memory layers on a neural network to try and exploit the temporal ordering of the information. Since not all the variables are historical, that have built a time series with just the one that are historical context, and we have treated the rest with a fully connected network. By using this approach our intention is to capture not only the static context of the data, but also the past that leads to each station's state.
 
-```python
-
-import numpy as np
-import pandas as pd
-import tensorflow as tf
-# Assuming your dataframe is named 'df'
-# Extract the static data, the target and the time series data in seperate arrays
-
-X_submission = pd.read_csv('/content/drive/MyDrive/CapstoneProject/prepped_data/X_submission.csv')
-X_train = pd.read_csv('/content/drive/MyDrive/CapstoneProject/prepped_data/X_train.csv', delimiter = ',').drop('index', axis = 1)
-y_train = pd.read_csv('/content/drive/MyDrive/CapstoneProject/prepped_data/y_train.csv', delimiter = ',')
-
-X_val = pd.read_csv('/content/drive/MyDrive/CapstoneProject/prepped_data/X_val.csv', delimiter = ',').drop('index', axis = 1)
-y_val = pd.read_csv('/content/drive/MyDrive/CapstoneProject/prepped_data/y_val.csv', delimiter = ',')
-
-X_val24 = pd.read_csv('/content/drive/MyDrive/CapstoneProject/prepped_data/X_val24.csv', delimiter = ',').drop('index', axis = 1)
-y_val24 = pd.read_csv('/content/drive/MyDrive/CapstoneProject/prepped_data/y_val24.csv', delimiter = ',')
-
-#################################################################################
-
-
-static_columns = ['is_weekend', 'timeframe1',
-       'timeframe2', 'timeframe3', 'timeframe4', 'timeframe5', 'cos_month',
-       'sin_month', 'cos_day', 'sin_day', 'cos_hour', 'sin_hour',
-       'year_normed', 'lat', 'lon', 'temperature', 'mm_precip']
-
-
-X_train_static = X_train[static_columns].values
-
-X_train_ts = np.stack((X_train[['temperature-1', 'mm_precip-1', 'ctx-1']].values,
-                       X_train[['temperature-2', 'mm_precip-2', 'ctx-2']].values,
-                       X_train[['temperature-3', 'mm_precip-3', 'ctx-3']].values,
-                       X_train[['temperature-4', 'mm_precip-4', 'ctx-4']].values),
-                       axis = 1)
-train_target = y_train[['percentage']].values
-
-#################################################################################
-
-X_val_static = X_val[static_columns].values
-
-X_val_ts = np.stack((X_val[['temperature-1', 'mm_precip-1', 'ctx-1']].values,
-                     X_val[['temperature-2', 'mm_precip-2', 'ctx-2']].values,
-                     X_val[['temperature-3', 'mm_precip-3', 'ctx-3']].values,
-                     X_val[['temperature-4', 'mm_precip-4', 'ctx-4']].values),
-                     axis = 1)
-val_target = y_val[['percentage']].values
-
-#################################################################################
-
-X_val24_static = X_val24[static_columns].values
-
-X_val24_ts = np.stack((X_val24[['temperature-1', 'mm_precip-1', 'ctx-1']].values,
-                       X_val24[['temperature-2', 'mm_precip-2', 'ctx-2']].values,
-                       X_val24[['temperature-3', 'mm_precip-3', 'ctx-3']].values,
-                       X_val24[['temperature-4', 'mm_precip-4', 'ctx-4']].values),
-                     axis = 1)
-val24_target = y_val24[['percentage']].values
-
-################################################################################
-
-
-X_sub_static = X_submission[static_columns].values
-
-X_sub_ts = np.stack((X_submission[['temperature-1', 'mm_precip-1', 'ctx-1']].values,
-                     X_submission[['temperature-2', 'mm_precip-2', 'ctx-2']].values,
-                     X_submission[['temperature-3', 'mm_precip-3', 'ctx-3']].values,
-                     X_submission[['temperature-4', 'mm_precip-4', 'ctx-4']].values),
-                     axis = 1)
-					 
-					 
-```
-
 We construct a neural network by separating it into two parts, one for the time series data and one for the static data. The time series data is fed into an LSTM layer, the static data is fed into a dense layer
 
-```python
-
-import tensorflow as tf
-import keras
-from keras.layers import LSTM, Dense, Input, concatenate, Dropout, Bidirectional
-from keras.regularizers import l1, l2
-
-
-# Construct eh neural network by separating it into two parts, one for the time series data and one for the static data
-# The time series data is fed into an LSTM layer, the static data is fed into a dense layer
-
-ts_input = tf.keras.Input(shape=(4, 3), name='ts_input')
-static_input = tf.keras.Input(shape = (17,), name='static_input')
-
-####################################################################################################
-
-LSTM1 = LSTM(64, activation='tanh', return_sequences=True)(ts_input)
-dropout_lstm = Dropout(0.1)(LSTM1)
-LSTM2 = LSTM(64, activation = 'tanh', return_sequences = False)(dropout_lstm)
-lstm_out = Dropout(0.1)(LSTM2)
-
-####################################################################################################
-
-static1 = Dense(32, activation='relu')(static_input)
-dropout_static = Dropout(0.1)(static1)
-static2 = Dense(64, activation = 'relu')(dropout_static)
-dropout_static2 = Dropout(0.1)(static2)
-static3 = Dense(48, activation = 'relu')(dropout_static2)
-dropout_static3 = Dropout(0.1)(static3)
-static4 = Dense(32, activation = 'relu')(dropout_static3)
-static_out = Dropout(0.1)(static4)
-
-####################################################################################################
-
-merged_out = concatenate([lstm_out, static_out]) # join the outputs of the LSTM and dense layers and pass them into a final neuron
-
-layer_out1 = Dense(32, activation = 'relu')(merged_out)
-dropout_out1 = Dropout(0.1)(layer_out1)
-layer_out2 = Dense(24, activation = 'relu')(dropout_out1)
-dropout_out2 = Dropout(0.1)(layer_out2)
-layer_out3 = Dense(24, activation = 'relu')(dropout_out2)
-dropout_out3 = Dropout(0.1)(layer_out3)
-out_result = Dense(1, activation='sigmoid')(dropout_out3)
-
-model = tf.keras.Model(inputs=[ts_input, static_input], outputs=out_result)
-
-model.compile(optimizer='adam', loss='mse', metrics=['mse'])
-model.summary()
-
-```
 
 #### Neural Network Structure
 
@@ -769,13 +335,13 @@ We get recall similar results to that of the xgb model --> Further improvements 
 
 This section consists in two parts:
 
-· Creation of a dinamic heat map of dock availability that can be changed based on the month and year parameter. This will allow us to understand the pattern of bicycle usage across the city.
+- Creation of a dinamic heat map of dock availability that can be changed based on the month and year parameter. This will allow us to understand the pattern of bicycle usage across the city.
 
-· Performance of a buffer analysis. Here we are going to search for areas that are near the bike lanes but do not have a nearby bike station to detect potential zones where new bike stations could be installed. The buffer has been set in 500 meters based on the size of the city and the number of stations.
+- Performance of a buffer analysis. Here we are going to search for areas that are near the bike lanes but do not have a nearby bike station to detect potential zones where new bike stations could be installed. The buffer has been set in 500 meters based on the size of the city and the number of stations.
+
 ### a. Libraries
 
 ```python
-
 import folium
 from folium.plugins import HeatMap
 import pandas as pd
@@ -826,10 +392,11 @@ Next, we compute the average availability of bikes at each station for march 202
 
 A base map of the city is created using Folium and the bike lanes data is loaded from a GeoJSON file and added to the map.The heatmap is added to the map using the previously computed bike station data.
 
-The script then performs the buffer analysis. It iterates through each bike lane segment and checks if it's more than 500 meters away from any bike station. If it is, a marker is added to that point on the map. This analysis helps identify underserved areas where additional bike stations might be needed. Then is saved as an html.
+The script then performs the buffer analysis. It iterates through each bike lane segment and checks if it's more than 500 meters away from any bike station. If it is, a marker is added to that point on the map. This analysis helps identify undeserved areas where additional bike stations might be needed. Then is saved as an html.
 
 The output is the following:
 
-![Buffer Analysis](/capstone-project/temp_map_no_mark23.html)
+[Buffer Analysis](/capstone-project/temp_map_no_mark23.html)
 
 Remarks: With this buffer analysis we can see that there are several areas in the city that might need a station, such as Zona franca, the port of Barcelona or near Sant Adria de Besos.
+

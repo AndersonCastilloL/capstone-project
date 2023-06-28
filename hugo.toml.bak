@@ -4,25 +4,25 @@ languageCode = "en"
 title = "Bike Availability Prediction Project"
 theme = "gokarna"
 disqusShortname = "ilusionismo-con-github-pages"
+author = 'Pau Torrente - Anderson Castillo - Rohit Lachman'
 
 [taxonomies]
   tag = "tags"
   category = "categories"
-
+  
 [params]
   showPostsOnHomePage = "popular"
   footer = "The Cyclists"
   description = "Data Science & Machine Learning Final Project"
+  customFooterHTML = """
+    <!-- KaTeX -->
+    <p align="center">
+	<a href="https://www.bicing.barcelona/">
+		<img src="https://upload.wikimedia.org/wikipedia/commons/thumb/a/a1/Bicing_logo.svg/1024px-Bicing_logo.svg.png" alt="Bicing" width="300" height="125">
+	</a>
+	</p>
+  """
 
-socialIcons = [
-    {name = "twitter", url = "https://example.com"},
-    {name = "linkedin", url = "https://example.com"},
-    {name = "stackoverflow", url = "https://example.com"},
-    {name = "dribbble", url = "https://example.com"},
-    {name = "instagram", url = "https://example.com"},
-    {name = "twitch", url = "https://example.com"},
-    {name = "email", url = "mailto:example@example.com"}
-]
 metaKeywords = ["blog", "gokarna", "hugo"]
 
 [menu]
@@ -39,20 +39,7 @@ metaKeywords = ["blog", "gokarna", "hugo"]
     weight = 2
 
   [[menu.main]]
-    name = "Tags"
-    pre = "<span data-feather='tag'></span>"
-    url = "/tags/"
-    weight = 3
-
-  [[menu.main]]
     identifier = "github"
     pre = "<span data-feather='github'></span>"
     url = "https://github.com/AndersonCastilloL/capstone-project"
     weight = 4
-
-
-[markup]
-  [markup.tableOfContents]
-    startLevel = 1
-    endLevel = 4
-    ordered = false
