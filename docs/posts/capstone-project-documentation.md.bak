@@ -68,11 +68,11 @@ The second flow in Tableau Prep get the hyper files of bicing station status (20
 
 The same process is applied to the bicing station status 2023 but filtering docks_availability and bike_availability. These fields will be evaluated and predicted by the models.
 
-![Third Tableau flow](/capstone-project/static/third-tableau-flow.png)
+![Third Tableau flow](/capstone-project/assets/third-tableau-flow.png)
 
 Finally, the last flow transform the input data of the preview flow using a aggregation to the level year, month, day and hour calculating average of the rest of fields and creating four aditionals fields with the porcent of docks availability in the four hours before.
 
-![Fourth Tableau flow](/capstone-project/static/fourth-tableau-flow.png)
+![Fourth Tableau flow](/capstone-project/assets/fourth-tableau-flow.png)
 
 Before training and testing, the data is analyzed to identify patterns, outliers and to visualize relevant features.
 

@@ -80,7 +80,7 @@ Before training and testing, the data is analyzed to identify patterns, outliers
 
 Visual analysis of data constructed based on the final output to identify outliers, COVID behaviors and relevant characteristics before training and testing with machine learning models
 
-![Bicing Data Analysis](/bicing-data-analysis.png)
+![Bicing Data Analysis](/capstone-project/assets/bicing-data-analysis.png)
 
 
 The theme’s repository is: [https://github.com/526avijitgupta/gokarna](https://github.com/526avijitgupta/gokarna).
