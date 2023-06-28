@@ -4,6 +4,7 @@ languageCode = "en"
 title = "Bike Availability Prediction Project"
 theme = "gokarna"
 disqusShortname = "ilusionismo-con-github-pages"
+author = 'Pau Torrente - Anderson Castillo - Rohit Lachman'
 
 [taxonomies]
   tag = "tags"
@@ -30,20 +31,7 @@ metaKeywords = ["blog", "gokarna", "hugo"]
     weight = 2
 
   [[menu.main]]
-    name = "Tags"
-    pre = "<span data-feather='tag'></span>"
-    url = "/tags/"
-    weight = 3
-
-  [[menu.main]]
     identifier = "github"
     pre = "<span data-feather='github'></span>"
     url = "https://github.com/AndersonCastilloL/capstone-project"
     weight = 4
-
-
-[markup]
-  [markup.tableOfContents]
-    startLevel = 1
-    endLevel = 4
-    ordered = false
