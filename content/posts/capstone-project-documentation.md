@@ -25,7 +25,7 @@ There are two main objective in this project:
 
 ## Get the Data
 
-The Bicing stations status and information of the city of Barcelona were downloaded from [Open Data BCN](www.opendata-ajuntament.barcelona.cat)
+The Bicing stations status and information of the city of Barcelona were downloaded from [Open Data BCN](https://opendata-ajuntament.barcelona.cat)
 
 ### a. Download the Data
 
