@@ -181,27 +181,7 @@
 </span></span><span style="display:flex;"><span>        os.system<span style="color:#f92672">(</span>f<span style="color:#e6db74">&#34;wget &#39;https://opendata-ajuntament.barcelona.cat/resources/bcn/BicingBCN/{year}_{month:02d}_{month_name}_BicingNou_ESTACIONS.7z&#39;&#34;</span><span style="color:#f92672">)</span>
 </span></span><span style="display:flex;"><span>        os.system<span style="color:#f92672">(</span>f<span style="color:#e6db74">&#34;7z x &#39;{year}_{month:02d}_{month_name}_BicingNou_ESTACIONS.7z&#39;&#34;</span><span style="color:#f92672">)</span>
 </span></span><span style="display:flex;"><span>        os.system<span style="color:#f92672">(</span>f<span style="color:#e6db74">&#34;rm &#39;{year}_{month:02d}_{month_name}_BicingNou_ESTACIONS.7z&#39;&#34;</span><span style="color:#f92672">)</span>
-</span></span></code></pre></div><h3 id="b-consolidate-the-data">b. Consolidate the Data</h3>
-<p>The consolidation of the Data was built in Tableau using Tableau Prep which give us more flexibility to join, filter and build the next structure according with our metadata-sample-submission.csv</p>
-<h4 id="metadata-sample-submission">Metadata Sample Submission</h4>
-<p><img src="/images/metadata-sample-submission.png" alt="Metadata Sample Submission"></p>
-<h2 id="discover-and-visualize-the-data-to-gain-insights">Discover and visualize the data to gain insights</h2>
-<p>Data consolidation, visualization and analysis with Tableau</p>
-<h3 id="a-tableau-workflow">a. Tableau Workflow</h3>
-<p>The first flow in Tableau Prep let you consolidate the bicing station status files of all years and create new columns like year, month, day and hour.
-The flow has two subflows because is necesary applied the same process to bicing station 2023 files. Both flows create new files with a hyper format which is easier to manage and control the data.</p>
-<p><img src="/first-tableau-flow.png" alt="First Tableau flow"></p>
-<p>The second flow in Tableau Prep get the hyper files of bicing station status (2019-2022) to join with the last bicing station information (March, 2023) to get the extra information like longitude, lattitude, name, capacity and postcode.</p>
-<p><img src="/second-tableau-flow.png" alt="Second Tableau flow"></p>
-<p>The same process is applied to the bicing station status 2023 but filtering docks_availability and bike_availability. These fields will be evaluated and predicted by the models.</p>
-<p><img src="/third-tableau-flow.png" alt="Third Tableau flow"></p>
-<p>Finally, the last flow transform the input data of the preview flow using a aggregation to the level year, month, day and hour calculating average of the rest of fields and creating four aditionals fields with the porcent of docks availability in the four hours before.</p>
-<p><img src="/fourth-tableau-flow.png" alt="Fourth Tableau flow"></p>
-<p>Before training and testing, the data is analyzed to identify patterns, outliers and to visualize relevant features.</p>
-<h3 id="b-analysis-in-tableau">b. Analysis in Tableau</h3>
-<p>Visual analysis of data constructed based on the final output to identify outliers, COVID behaviors and relevant characteristics before training and testing with machine learning models</p>
-<p><img src="/bicing-data-analysis.png" alt="Bicing Data Analysis"></p>
-<p>The theme’s repository is: <a href="https://github.com/526avijitgupta/gokarna">https://github.com/526avijitgupta/gokarna</a>.</p>
+</span></span></code></pre></div><p>The theme’s repository is: <a href="https://github.com/526avijitgupta/gokarna">https://github.com/526avijitgupta/gokarna</a>.</p>
 <p>You can download the <a href="https://github.com/526avijitgupta/gokarna/releases">latest release :books: .zip file</a> of the theme and extract it in the <code>themes</code> directory.</p>
 <p>Alternatively, clone this repository to the <code>themes</code> directory:</p>
 <div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>git clone https://github.com/526avijitgupta/gokarna.git themes/gokarna
@@ -400,17 +380,6 @@ The flow has two subflows because is necesary applied the same process to bicing
         <li><a href="#get-the-data">Get the Data</a>
           <ul>
             <li><a href="#a-download-the-data">a. Download the Data</a></li>
-            <li><a href="#b-consolidate-the-data">b. Consolidate the Data</a>
-              <ul>
-                <li><a href="#metadata-sample-submission">Metadata Sample Submission</a></li>
-              </ul>
-            </li>
-          </ul>
-        </li>
-        <li><a href="#discover-and-visualize-the-data-to-gain-insights">Discover and visualize the data to gain insights</a>
-          <ul>
-            <li><a href="#a-tableau-workflow">a. Tableau Workflow</a></li>
-            <li><a href="#b-analysis-in-tableau">b. Analysis in Tableau</a></li>
             <li><a href="#basic-configuration">c. Basic Configuration</a></li>
             <li><a href="#d-create-your-first-post">d. Create Your First Post</a></li>
             <li><a href="#e-launching-the-website-locally">e. Launching the Website Locally</a></li>
