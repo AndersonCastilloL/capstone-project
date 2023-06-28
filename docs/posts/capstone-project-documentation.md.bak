@@ -227,17 +227,17 @@ We have three datasets. The first dataset is for training purposes, the second d
 
   ![X-Train dataset](/capstone-project/x-train.png)
 
-#### Validation Dataset (5 hr)
+- Validation Dataset (5 hr)
 
-![X-Val dataset](/capstone-project/x-val.png)
+  ![X-Val dataset](/capstone-project/x-val.png)
 
-#### Validation Dataset with all hours (24 hr)
+- Validation Dataset with all hours (24 hr)
 
-![X-Val24 dataset](/capstone-project/x-val24.png)
+  ![X-Val24 dataset](/capstone-project/x-val24.png)
 
-#### Submission Dataset (Testing Dataset)
+- Submission Dataset (Testing Dataset)
 
-![X-Submission dataset](/capstone-project/x-submission.png)
+  ![X-Submission dataset](/capstone-project/x-submission.png)
 
 ## Model Selection and Training
 

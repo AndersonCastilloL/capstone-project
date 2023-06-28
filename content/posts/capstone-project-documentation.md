@@ -109,6 +109,8 @@ with open('weather_data/weather.csv', mode = 'w', newline='') as csvfile:
         time.sleep(freq)
 ```
 
+Due to the capacity of the data, they are stored in [Google Drive](https://drive.google.com/drive/folders/1ZIY2ZMhsCITuSFC1bnIDJrbZh-sS63HP?usp=drive_link).
+
 ### b. Consolidate the Data
 
 The consolidation of the Data was built in Tableau using Tableau Prep which give us more flexibility to join, filter and build the next structure according with our metadata-sample-submission.csv
