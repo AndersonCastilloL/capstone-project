@@ -1,15 +1,13 @@
-baseURL = "https://andersoncastillol.github.io/capstone-project/"
-defaultContentLanguage = "en"
-languageCode = "en"
-
-title = "Bike Availability Prediction Project"
-
-theme = "gokarna"
-
-# Automatically generate robots.txt
-enableRobotsTXT = true
-
+baseURL = "https://andersoncastillol.github.io/"
 publishDir = "docs"
+languageCode = "en"
+title = "Bike Availability Prediction Project"
+theme = "gokarna"
+disqusShortname = "ilusionismo-con-github-pages"
+
+[taxonomies]
+tag = "tags"
+category = "categories"
 
 [params]
   footer = "The Cyclists"
