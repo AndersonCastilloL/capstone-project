@@ -767,8 +767,11 @@ We get recall similar results to that of the xgb model --> Further improvements 
 
 ## Heatmap and Buffer Analysis
 
-Search for areas that are near existing bike lanes but do not have a nearby bike station. The buffer has been set to 500 meters.
+This section consists in two parts:
 
+· Creation of a dinamic heat map of dock availability that can be changed based on the month and year parameter. This will allow us to understand the pattern of bicycle usage across the city.
+
+· Performance of a buffer analysis. Here we are going to search for areas that are near the bike lanes but do not have a nearby bike station to detect potential zones where new bike stations could be installed. The buffer has been set in 500 meters based on the size of the city and the number of stations.
 ### a. Libraries
 
 ```python
@@ -795,107 +798,38 @@ import geopy.distance
 import math
 
 ```
+### b. Heatmap
 
-Create a joined dataframe that will be used for the heatmap analysis
+The code is designed to generate and display the dinamic heatmap that represents the average availability of bike docks across the city, given a specific month and year.First, lets create a joined dataframe that will be used for the heatmap analysis
 
-```python
-df_info1 = dd.concat([train_df, validation_df])
-df_info.head()
 
-```
 ![Heatmap Dataframe](/capstone-project/heatmap-dataframe.png)
 
+Now we are going to calculate the average percentage of bike availability at each station using the historical data. then we will generate a heatmap based on this data, with coordinates of each station and a color intensity indicating the level of bike availability. This heatmap is overlaid onto the city map created using Folium, providing a clear visualization of bike availability in different areas of the city.
 
-### b. Dash Definition and HeatMap Generation
-
-```python
-
-# Dash definition
-app = JupyterDash(__name__)
-
-def generate_heatmap(year, month):
-    selected_info = df_info[(df_info['year'] == float(year)) & (df_info['month'] == float(month))]
-    print("Selected info:")
-    print(selected_info.head())
-
-    selected_info['average_percentage'] = selected_info[['percentage', 'ctx-4', 'ctx-3', 'ctx-2', 'ctx-1']].mean(axis=1)
-    average_availability = selected_info.groupby('station_id').mean().reset_index()
-    print(average_availability.head())
-
-    heatmap_data = [(row['lat'], row['lon'], 1 - row['average_percentage']) for idx, row in average_availability.iterrows()]
-    print(heatmap_data[:5])
-
-    folium_map = folium.Map(location=[41.3870154, 2.1700471], zoom_start=13)
-
-
-
-    with open('/content/drive/MyDrive/CapstoneProject/CARRIL_BICI.geojson') as f:
-        bikelane_data = json.load(f)
-    folium.GeoJson(bikelane_data).add_to(folium_map)
-
-    HeatMap(heatmap_data).add_to(folium_map)
-
-    # Map saved as html
-    folium_map.save('/tmp/temp_map.html')
-
-    # Copy in Google drive
-    !cp /tmp/temp_map.html /content/drive/MyDrive/CapstoneProject/
-
-# Initial map for the first year and month
-generate_heatmap(years[0], months[0])
-
-# Dash Layout
-app.layout = html.Div([
-    html.H1("Disponibilidad de estaciones de Bicing"),
-    html.H2(id='map-title', children="Disponibilidad: Mes/Año"),
-    dcc.Dropdown(
-        id='year-dropdown',
-        options=[{'label': str(year), 'value': year} for year in years],
-        value=years[0]
-    ),
-    dcc.Dropdown(
-        id='month-dropdown',
-        options=[{'label': str(month), 'value': month} for month in months],
-        value=months[0]
-    ),
-    html.Iframe(id = 'map', srcDoc = open('/content/drive/MyDrive/CapstoneProject/temp_map.html', 'r').read(), width = '100%', height = '600')
-])
-
-   # Map update
-@app.callback(
-    [Output('map', 'srcDoc'),
-    Output('map-title', 'children')],
-    [Input('year-dropdown', 'value'),
-    Input('month-dropdown', 'value')])
-def update_map(year, month):
-    generate_heatmap(year, month)
-    return open('/content/drive/MyDrive/CapstoneProject/temp_map.html', 'r').read(), f'Disponibilidad: {month}/{year}'
-
-if __name__ == '__main__':
-
-   app.run_server(debug=True)
-   
-   
-from math import radians, cos, sin, asin, sqrt
-
-def calculate_distance(lat1, lon1, lat2, lon2):
-
-    # Convert coordinates from degrees to radians
-    lon1, lat1, lon2, lat2 = map(radians, [lon1, lat1, lon2, lat2])
-
-    # haversine
-    dlon = lon2 - lon1
-    dlat = lat2 - lat1
-    a = sin(dlat/2)**2 + cos(lat1) * cos(lat2) * sin(dlon/2)**2
-    c = 2 * asin(sqrt(a))
-    r = 6371  # Earth radius in km
-
-    return c * r * 1000  # Convert to meters
-   
-```
-
-### c. Bicing HeatMap Generation
+The resulting map is saved as an HTML file in a temporary location and then the interface powered by Dash includes dropdown menus for selecting the month and year of interest. The map updates dynamically based on these selections, providing a tool for exploring dock availability across different times.
 
 ![Heatmap](/capstone-project/bicing-heatmap-capture.png)
 
 ![Heatmap2](/capstone-project/bicing-heatmap-capture2.png)
+
+
+Remarks: If we compare the different periods, we can see that in general, the downtown is the area where there is a major use of bicycle and therefore less availability.
+
+### c. Buffer Analysis
+
+This produces a heatmap representing the average availability of bikes at different stations in march 2023 including the buffer analysis around bike lanes.
+
+First, we define a function function to calculate the geographical distance between two points on Earth given their latitude and longitude. This function will be later used in the buffer analysis.
+
+Next, we compute the average availability of bikes at each station for march 2023. This data is used to create a list of tuples where each tuple contains the latitude, longitude, and availability of a bike station. The bike availability is subtracted from 1 to display lack of availability in the heatmap.
+
+A base map of the city is created using Folium and the bike lanes data is loaded from a GeoJSON file and added to the map.The heatmap is added to the map using the previously computed bike station data.
+
+The script then performs the buffer analysis. It iterates through each bike lane segment and checks if it's more than 500 meters away from any bike station. If it is, a marker is added to that point on the map. This analysis helps identify underserved areas where additional bike stations might be needed. Then is saved as an html.
+
+The output is the following:
+
+![Buffer Analysis](/capstone-project/temp_map_no_mark23.html)
+
+Remarks: With this buffer analysis we can see that there are several areas in the city that might need a station, such as Zona franca, the port of Barcelona or near Sant Adria de Besos.
