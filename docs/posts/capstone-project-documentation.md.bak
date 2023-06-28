@@ -48,7 +48,7 @@ The consolidation of the Data was built in Tableau using Tableau Prep which give
 
 #### Metadata Sample Submission
 
-![Metadata Sample Submission](/metadata-sample-submission.png)
+![Metadata Sample Submission](/docs/metadata-sample-submission.png)
 
 ## Discover and visualize the data to gain insights
 
