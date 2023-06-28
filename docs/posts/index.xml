@@ -13,10 +13,7 @@
       <pubDate>Mon, 26 Jun 2023 21:29:01 +0800</pubDate>
       
       <guid>https://andersoncastillol.github.io/capstone-project/posts/capstone-project-documentation/</guid>
-      <description>What&amp;rsquo;s Bicing ? The new Bicing service includes more territorial coverage, an increase in the number of bicycles, mixed stations for conventional and electric bicycles, new and improved types of stations and bicycles (safety, anchorage, comfort), extended schedules and much more!
-Goal There are two main objective in this project:
-Predict the number of free docks given the historical data (Docks Availability Percent).
-Explore new places where stations are needed.</description>
+      <description>Introduction The Bicing service is a great way to navigate through the city of Barcelona, leveraging its extensive bike lane network. Nowadays, electric bikes are also available, and so the usage of the service has grown quite a bit over the years. In this study the main objective is to try to predict the availability of free docks throughout the city during march of 2023 using data from the previous 4 years, this being a really important feature to guide the users to the best stations, not westing any time looking for bikes/free docks.</description>
     </item>
     
   </channel>
