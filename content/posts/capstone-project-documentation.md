@@ -8,32 +8,22 @@ type: post
 showTableOfContents: true
 ---
 
-## What's Bicing ?
+## Introduction
 
-The new Bicing service includes more territorial coverage, an increase in the number of bicycles, mixed stations for conventional and electric bicycles, new and improved types of stations and bicycles (safety, anchorage, comfort), extended schedules and much more!
+The Bicing service is a great way to navigate through the city of Barcelona, leveraging its extensive bike lane network. Nowadays, electric bikes are also available, and so the usage of the service has grown quite a bit over the years.
+In this study the main objective is to try to predict the availability of free docks throughout the city during march of 2023 using data from the previous 4 years, this being a really important feature to guide the users to the best stations, not westing any time looking for bikes/free docks.
+Apart from this prediction task, we have also looked at the evolution of the usage of the network by using heatmaps, and tried to look for places along bike lanes where the construction of future stations could make sense.
 
-## Goal
+The notebook where all the analysis has been done can be found in the GitHub repository, but due to the huge size of the datasets, the full project can be found in the following [Google Drive](https://drive.google.com/drive/folders/1ZIY2ZMhsCITuSFC1bnIDJrbZh-sS63HP?usp=drive_link) folder. In there you will be able to find all the data used, aswell as the models and other figures and material.
 
-There are two main objective in this project:
+## Gathering the Data
 
-- Predict the number of free docks given the historical data (Docks Availability Percent).
+For this data project, we have started off with the following data:
 
-- Explore new places where stations are needed.
+- The bicing stations information and status, obtained from [Open Data BCN](https://opendata-ajuntament.barcelona.cat)
 
-- Explore how different events affect availability.
+- The weather of the city of Barcelona, obtained from the [Meteo Cat](https://www.meteo.cat) public API
 
-
-## Get the Data
-
-According with the project we have the next sources:
-
-- The bicing stations status
-- The bicing stations information
-- The weather of the city of Barcelona
-
-The Bicing stations status and information of the city of Barcelona were downloaded from [Open Data BCN](https://opendata-ajuntament.barcelona.cat) and the weather information to join with bicing stations were downloaded from [Meteo Cat](https://www.meteo.cat).
-
-### a. Download the Data
 
 The following script was used to download the data from [Open Data BCN](https://opendata-ajuntament.barcelona.cat) by year and month:
 
@@ -49,88 +39,29 @@ for year in [2022, 2021, 2020, 2019]:
 
 ```
 
-The following script was used to download the data from [Meteo Cat](https://www.meteo.cat) and integrate it into the station availability patterns
+And the script used to do requests on the [Meteo Cat](https://www.meteo.cat) public API can be found on the Google Drive of the project, in the weather folder.
 
-```python
-# CODE TO RETRIEVE DATA FROM THE WEATHER API AND STORE IT IN A CSV FILE
-# FROM 2019/01/01 TO 2023/03/31
+### b. Data merging
 
-import requests
-import time
-import datetime as dt
-import csv 
-
-key = 'enJH8FUX2z5Ar7NSCJvYI8pAIuDW0XDV9nbSkEMj'
-
-start_date = dt.date(2019, 1, 1)
-end_date = dt.date(2023, 3, 31)
-
-assert start_date < end_date, 'Start date must be before end date'
-
-delta = dt.timedelta(days=1)
-
-freq = 1/20
-
-day = start_date
-
-columns = ['timestamp', 'mm_precip', 'temperature']
-
-with open('weather_data/weather.csv', mode = 'w', newline='') as csvfile:
-    writer = csv.DictWriter(csvfile, fieldnames=columns)
-    writer.writeheader()
-
-    while day <= end_date:
-
-        day_string = day.strftime('%Y/%m/%d')
-
-        url = 'https://api.meteo.cat/xema/v1' + '/estacions/mesurades/X8/' + day_string 
-
-        print(day_string)
-
-        headers = {'Accept': 'application/json', 'X-API-KEY': key}
-
-        data = requests.get(url, headers=headers).json()[0]
-
-        # the codi variables, 35 and 32, correspond to precipitation and temperature respectively. The json file retrieved
-        # contains information on many more variables, but we are only interested in these two.
-
-        precipitation = [data['variables'][i]['lectures'] for i in range(len(data['variables'])) if data['variables'][i]['codi'] == 35][0]
-        temperature = [data['variables'][i]['lectures'] for i in range(len(data['variables'])) if data['variables'][i]['codi'] == 32][0]
-
-        date_variables = [{'timestamp':int(dt.datetime.strptime(d['data'], '%Y-%m-%dT%H:%MZ').timestamp()), 'mm_precip':d['valor']} for d in precipitation]
-
-        for i in range(len(date_variables)):
-            date_variables[i]['temperature'] = temperature[i]['valor']
-
-        writer.writerows(date_variables)
-
-        day += delta
-
-        time.sleep(freq)
-```
-
-Due to the capacity of the data, they are stored in [Google Drive](https://drive.google.com/drive/folders/1ZIY2ZMhsCITuSFC1bnIDJrbZh-sS63HP?usp=drive_link).
-
-### b. Consolidate the Data
-
-The consolidation of the Data was built in Tableau using Tableau Prep which give us more flexibility to join, filter and build the next structure according with our metadata-sample-submission.csv
+The data obtained from [Open Data BCN](https://opendata-ajuntament.barcelona.cat) is separated into multiple datasets, each one containing either the information or the status of the stations for each month. To work with so many huge datasets at the same time, the processing of the data was done in Tableau using Tableau Prep which give us more flexibility to join, filter and build the next structure according to our metadata-sample-submission.csv
 
 #### Metadata Sample Submission
 
 ![Metadata Sample Submission](/capstone-project/metadata-sample-submission.png)
 
-## Discover and visualize the data to gain insights
+## Data exploration
 
-Data consolidation, visualization and analysis with Tableau
+All of the following analysis, as already mentiones, has been done with tableau due to its low Ram demand and speed.
 
 ### a. Tableau Workflow
 
-The first flow in Tableau Prep let you consolidate the bicing station status files of all years and create new columns like year, month, day and hour. 
-The flow has two sub-flows because is necessary applied the same process to bicing station 2023 files. Both flows create new files with a hyper format which is easier to manage and control the data.
+The first flow in Tableau Prep concatenates all the bicing station status files of all years and creates new columns like year, month, day and hour. 
+The flow has two sub-flows because is necessary to also apply the same process to bicing station 2023 files. Both flows create new files with a hyper format which is easier to manage and control.
 
 ![First Tableau flow](/capstone-project/first-tableau-flow.png)
 
-The second flow in Tableau Prep get the hyper files of bicing station status (2019-2022) to join with the last bicing station information (March, 2023) to get the extra information like longitude, latitude, name, capacity and postcode.
+The second flow in Tableau Prep gets the hyper files of bicing station status (2019-2022) and merges them with the last bicing station information (March, 2023) to get information on longitude, latitude, name, capacity and postcode.
+At this point the first relevant approximation is made, as the capacity of the stations in the training data is taken as the one from 2023 and not the "real" one.
 
 ![Second Tableau flow](/capstone-project/second-tableau-flow.png)
 
@@ -138,91 +69,67 @@ The same process is applied to the bicing station status 2023 but filtering dock
 
 ![Third Tableau flow](/capstone-project/third-tableau-flow.png)
 
-Finally, the last flow transform the input data of the preview flow using a aggregation to the level year, month, day and hour calculating average of the rest of fields and creating four additional fields with the percent of docks availability in the four hours before.
+Finally, the last flow transforms the input data of the preview flow using an aggregation to year, month, day and hour, calculating averages on the rest of fields and creating four additional fields with the percentage of docks available in the four hours before.
 
 ![Fourth Tableau flow](/capstone-project/fourth-tableau-flow.png)
 
 Before training and testing, the data is analyzed to identify patterns, outliers and to visualize relevant features.
 
-### b. Analysis in Tableau
+### b. Visual Analysis in Tableau
 
-Visual analysis of data constructed based on the final output to identify outliers, COVID behaviors and relevant characteristics before training and testing with machine learning models
+Before training and testing with machine learning models, we used the following charts to visually analyze the data constructed based on the final output to identify outliers, COVID behaviors and relevant characteristics 
 
 ![Bicing Data Analysis](/capstone-project/bicing-data-analysis.png)
 
-With all the consolidate information we start to clean and processes the data to prepare our dataframes of training and testings.
+Where we can see that as expected, the percentage of docks available increases as we get to upper areas of the city, where the users take the bikes and ride them downhill to the lower areas.
+Also, we canb observe the effects of covid, especially in 2020 where the lockdown shows up as no available bikes.
 
 ## Prepare the data for Machine Learning algorithms
 
-### a. Importation of data in Colab
+Once we have merged all the datasets into one huge one, the next step is to process all the information, now in python using Google Colab. All of this process has been done in the following steps:
 
-We load the dataframes of bicing station (validation and training), weather and testing.
-
-```python
-station_dataframe = dd.read_csv('/content/drive/MyDrive/CapstoneProject/data_bicing_joined_HX_23.csv', assume_missing=True, delimiter=';')
-
-weather_dataframe = dd.read_csv('/content/drive/MyDrive/CapstoneProject/weather.csv', assume_missing=True, delimiter=',')
-
-data_2_predict = dd.read_csv('/content/drive/MyDrive/CapstoneProject/metadata_sample_submission.csv', delimiter=',')
-
-```
 ### b. Data Cleaning and Filtering
 
-- Initial cleaning to go from the format that the Tableau merger outputs to the one desired for the model.
-- The objective of this first step is to leave the training data in the same format as the submission one.
+To start, we have to clean the raw data that Tableau outputs following:
+
+- Initial cleaning to go from the format that the Tableau merger outputs to the one desired for the model. The objective of this first step is to leave the training data in the same format as the submission one.
 - Drop all rows with out of service stations and year 2020, to avoid COVID effects on our training data.
 - Select the features with the highest relevance (station_id, lat, lon, year, month, day, hour, ctx-4, ctx-3, ctx-2, ctx-1, percentage).
-- Split the data into training and validation.
+
+- Split the data, by leaving 1029, 2021 and 2022 for training and 2023 for validation.
+
 - Filter only the data with status "IN_SERVICE".
 
 ### c. Processing pipelines
 
-Apart from the preprocessing done using tableau to create the initial dataframe, everything else will be done using sklearn pipelines. 
+Apart from the preprocessing done using tableau to create the initial dataframe, everything else will be done using sklearn pipelines. We have built 4 different ones:
 
-Creation of the 4 pipelines:
-- train_preparator: 
-  - to prepare the training data, not used for the submission data as we already have location data.
-  - we have five transformers. The first merge the data with weather dataframe and include the creation of the datatime column.
-  - the second transform add new columns of time.
-  - the third and fourth transformer filter the hours to avoid overlapping and normalize datetime columnes like month, day, hour and year.
-  
-- submisison_preparator and val_preparator: 
-  - to prepare the submission data, not used for the training data as we don't have location data. Not a problem since we are not fitting to any data, just transforming with data we already have
-  - we keep the same transformers of the previous pipeline because we want to have the same structure with the data.
+- train_preparator: Adds the weather data, classifies the registers in 5 hour intervals and marks them with a 1 if they correspond to a weekend day, selects only 5 hours of the day to prevent overlapping between registers and normalizes the time data. 
+- val_preparator: Same procedure as train_preparator but selecting all 24 hours of the day to resemble what the submission will contain
+- submission_preparator: Again, same procedure, but also adding the location of the station to the dataset, as the one that we are using, downloaded from kaggle does not contain this valuable informatio
   
 - scaling_pipeline: 
-  - to fill and scale certain column in the data, used for both training and submission data. In this case, we are fitting to the training data, and transforming both training and submission data
+  - to fill and scale certain columns in the data, fitting it to the training data, and transforming both training and submission data.
 
 
 ### d. Classes and Functions
 
-Each pipeline is supported by a set of functions and classes to structure the data and features. The functions are included like parameters inside of the classes.
+Each pipeline is supported by a set of functions and classes to structure the data and features. The functions are applied using classes that can be inserted in the pipelines and are the following:
 
-#### Functions
-
-- extra_time_info: add new columns of time like is_weekend, timeframe1, timeframe2, timeframe3, timeframe4, timeframe5 to group the hours
 - hour_selector: filter a range of hours to avoid overlapping with the columns with the same information of one to four hours before
-- time_norm: Time normalizer function to normalize the time columns to a 0-1 scale with periodicity. This is done by applying a sin and cos transformation to the columns
-- weather_prep: 
-  - weather dataframe preparator to leave it in the desired format to merge with the station dataframe.
-  - We convert the half hourly data to hourly data by averaging temperature and summing precipitation
-  - We also add a column with the datetime in order to merge the dataframes
+  
+- extra_time_info: add new columns of time like is_weekend, timeframe1, timeframe2, timeframe3, timeframe4, timeframe5 to group the hours. These timeframe columns are used to mitigate the effects of only training with 5 hours, by grouping all the ones in between.
+
+- time_norm: Time normalizer function to normalize the time columns to a -1/1 scale with periodicity. This is done by applying a sin and cos transformation to the columns
+  
 - weather_merge: Merge the main dataframe with weather dataframe and split datetime column in year, month, day and hour
 
-#### Classes
-
-- hour_selector_transformer: class to encapsulate the range of hours.
-- station_loc_transformer: class to join and encapsulate the latitude and longitude.
-- station_id_dropper: the class use station id dropper function to drop the station_id column from the dataset at the end of the pipeline. The prediction will be done on the location of the stations, not on the id.
-- time_norm_transformer: class to encapsulate a time columns and normalize them using time_norm function.
-- weather_merge_transformer: class to encapsulate the weather data and merge with main dataframe.
 
 
 ### e. Prepare all data and load data that has been saved
+Once we have our pipelines ready we pass through them the data to obtain 4 datasets.
 
-The following code load the data has been saved in the prepped_data folder, so there is no need to run this code again. We will just load it from our folder to work with the models
-
-We have three datasets. The first dataset is for training purposes, the second dataset considers only a specific range of hours to avoid overlapping data with the columns, and the last dataset is our test dataset, which is loaded on Kaggle.
+We have three datasets. The first dataset is for training purposes, the second dataset is for validation, considering only a specific range of hours just like in the training one, the third one is another validation dataset but now containing all 24 hours to compare the effects of this restriction on the training process, and the fourth one is the submission dataset.
 
 
 - Training Dataset
@@ -244,14 +151,15 @@ We have three datasets. The first dataset is for training purposes, the second d
 ## Model Selection and Training
 
 For this project we will use 2 different models. The first one is an xgboost regressor, that has been chosen following other similar projects to this one and that has outperformed with less training times other similar ensemble models. Then, a neural network containing LSTM layers is used to capture the temporal features and their ordering.
+We will start off with the xgboost models.
 
 ### a. XGBregressor
 
 We will first use a data subset to perform a grid search on the parameter space to find the ones that fit the best our xgboost model.
  
-#### RandomizedSearchCV and GridSearchCV
+#### Parameter tuning using GridSearchCV
 
-We apply both techniques to find the best parameters for our model after transforming our data using pipelines. We use an XGBRegressor and a set of parameters associated with it to evaluate the optimal parameters for training and prediction.
+We apply grid searhc with cross validation find the best parameters for our model after transforming our data using pipelines. We use an XGBRegressor and a set of parameters associated with it to evaluate the optimal parameters for training and prediction.
 
 ```python
 space = {
@@ -273,6 +181,8 @@ grid_search.fit(gs_subset, y_subset)
 Best parameters result
 
 ![Best Parameters GridSearch](/capstone-project/grdsearch-best-parameters.png)
+
+#### Training the XGBRegressor model
 
 Now that we have the best parameters for our subset of data we train the model. We also use the validation dataset to monitor the performance of the model during training to look for over-fitting curves
 
@@ -299,11 +209,11 @@ print('rmse:', rmse)
 
 Once we have trained the model, we are interested in knowing how the loss evolved during training, as well as what variables were the most relevant to predict the percentage of available docks
 
-#### Loss Function Graphic
+##### Loss Function Graphic
 
 ![Loss Function graphic](/capstone-project/loss-function-xgboost.png)
 
-#### Most Relevant Features
+##### Most Relevant Features
 
 ![Feature Importances Graphic](/capstone-project/feature-importance-xgboost.png)
 
@@ -313,8 +223,32 @@ The feature important plot is really interesting. From it we can conclude that:
 - The location of the station are the next most relevant features. The usage of the service is not homogeneous across the city and this impacts to availability of docks
 - timeframe2, corresponding to peak hours in the morning has quite a bit of weight. The stations network probably has the most activity in these hours
 - the hour also affects quite a bit the final %, as expected --> Since we are only training with
-- The weather does not even appear in the graph. We expected way more weight from those variables, especially rain. We guess that since Barcelona is not a very rainy city, the model does not see many registers with rain and so it end up ignoring completely the variable
+- The weather does not even appear in the graph. We expected way more weight from those variables, especially rain. We guess that since Barcelona is not a very rainy city, the model does not see many registers with rain and so it end up ignoring completely the variable.
 
+#### Second XGBRegresor model
+
+In earlier version of the code we worked with a more complex model than the one that GridSearch found to be the best, and ended up getting better results. To try to replicate that behaviour and see if we can get a better performance we have also trained the following model using the same procedure:
+
+```python
+
+xgb_model2 = XGBRegressor(objective='reg:squarederror',
+                          n_estimators=2000,
+                          max_depth=10,
+                          learning_rate=0.1,
+                          subsample=0.8,
+                          colsample_bytree=0.8,
+                          gamma=0.1,
+                          reg_alpha=0.1,
+                          reg_lambda=10.0,
+                          n_jobs=-1,
+                          random_state=128,
+                          early_stopping_rounds = 30)
+
+```
+Obtaining a slightly lower final rmse score (0.1019 vs 0.1100) and the following dfeature imporances and loss evolution curves:
+
+![Loss Function graphic](/static/xgb_loss2.png)
+![Feature Importances Graphic](/capstone-project/feature-importance-xgboost2.png)
 ### b. LSTM
 
 Apart from our xgbregressor model, and since our data contains historical data, we have also tried to study the prediction problem as a time-series analysis by working with long short-term memory layers on a neural network to try and exploit the temporal ordering of the information. Since not all the variables are historical, that have built a time series with just the one that are historical context, and we have treated the rest with a fully connected network. By using this approach our intention is to capture not only the static context of the data, but also the past that leads to each station's state.
