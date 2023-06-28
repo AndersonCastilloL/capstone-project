@@ -184,7 +184,7 @@
 </span></span></code></pre></div><h3 id="b-consolidate-the-data">b. Consolidate the Data</h3>
 <p>The consolidation of the Data was built in Tableau using Tableau Prep which give us more flexibility to join, filter and build the next structure according with our metadata-sample-submission.csv</p>
 <h4 id="metadata-sample-submission">Metadata Sample Submission</h4>
-<p><img src="/docs/metadata-sample-submission.png" alt="Metadata Sample Submission"></p>
+<p><img src="/metadata-sample-submission.png" alt="Metadata Sample Submission"></p>
 <h2 id="discover-and-visualize-the-data-to-gain-insights">Discover and visualize the data to gain insights</h2>
 <p>Data consolidation, visualization and analysis with Tableau</p>
 <h3 id="a-tableau-workflow">a. Tableau Workflow</h3>
