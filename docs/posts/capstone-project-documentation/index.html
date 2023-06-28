@@ -81,7 +81,7 @@
             </div>
             
             <div class="nav-link">
-                <a href="https://github.com/526avijitgupta/gokarna"><span data-feather='github'></span>  </a>
+                <a href="https://github.com/AndersonCastilloL/capstone-project"><span data-feather='github'></span>  </a>
             </div>
             
 
@@ -116,7 +116,7 @@
                 </li>
                 
                 <li class="nav-item">
-                    <a href="https://github.com/526avijitgupta/gokarna"><span data-feather='github'></span>  </a>
+                    <a href="https://github.com/AndersonCastilloL/capstone-project"><span data-feather='github'></span>  </a>
                 </li>
                 
                 <li class="nav-item dark-theme-toggle">
@@ -170,9 +170,15 @@
 </li>
 </ul>
 <h2 id="get-the-data">Get the Data</h2>
-<p>The Bicing stations status and information of the city of Barcelona were downloaded from <a href="https://opendata-ajuntament.barcelona.cat">Open Data BCN</a></p>
+<p>According with the project we have the next sources:</p>
+<ul>
+<li>The bicing stations status</li>
+<li>The bicing stations information</li>
+<li>The weather of the city of Barcelona</li>
+</ul>
+<p>The Bicing stations status and information of the city of Barcelona were downloaded from <a href="https://opendata-ajuntament.barcelona.cat">Open Data BCN</a> and the weather information to join with bicing stations were downloaded from <a href="https://www.meteo.cat">Meteo Cat</a>.</p>
 <h3 id="a-download-the-data">a. Download the Data</h3>
-<p>The following script was used to download the data by year and month:</p>
+<p>The following script was used to download the data of <a href="https://opendata-ajuntament.barcelona.cat">Open Data BCN</a> by year and month:</p>
 <div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>import os
 </span></span><span style="display:flex;"><span>
 </span></span><span style="display:flex;"><span>i2m <span style="color:#f92672">=</span> list<span style="color:#f92672">(</span>zip<span style="color:#f92672">(</span>range<span style="color:#f92672">(</span>1,13<span style="color:#f92672">)</span>, <span style="color:#f92672">[</span><span style="color:#e6db74">&#39;Gener&#39;</span>,<span style="color:#e6db74">&#39;Febrer&#39;</span>,<span style="color:#e6db74">&#39;Marc&#39;</span>,<span style="color:#e6db74">&#39;Abril&#39;</span>,<span style="color:#e6db74">&#39;Maig&#39;</span>,<span style="color:#e6db74">&#39;Juny&#39;</span>,<span style="color:#e6db74">&#39;Juliol&#39;</span>,<span style="color:#e6db74">&#39;Agost&#39;</span>,<span style="color:#e6db74">&#39;Setembre&#39;</span>,<span style="color:#e6db74">&#39;Octubre&#39;</span>,<span style="color:#e6db74">&#39;Novembre&#39;</span>,<span style="color:#e6db74">&#39;Desembre&#39;</span><span style="color:#f92672">]))</span>
@@ -181,6 +187,62 @@
 </span></span><span style="display:flex;"><span>        os.system<span style="color:#f92672">(</span>f<span style="color:#e6db74">&#34;wget &#39;https://opendata-ajuntament.barcelona.cat/resources/bcn/BicingBCN/{year}_{month:02d}_{month_name}_BicingNou_ESTACIONS.7z&#39;&#34;</span><span style="color:#f92672">)</span>
 </span></span><span style="display:flex;"><span>        os.system<span style="color:#f92672">(</span>f<span style="color:#e6db74">&#34;7z x &#39;{year}_{month:02d}_{month_name}_BicingNou_ESTACIONS.7z&#39;&#34;</span><span style="color:#f92672">)</span>
 </span></span><span style="display:flex;"><span>        os.system<span style="color:#f92672">(</span>f<span style="color:#e6db74">&#34;rm &#39;{year}_{month:02d}_{month_name}_BicingNou_ESTACIONS.7z&#39;&#34;</span><span style="color:#f92672">)</span>
+</span></span></code></pre></div><p>The following script was used to download the data of <a href="https://www.meteo.cat">Meteo Cat</a> to join and use in the patterns of the availability to the stations:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#75715e"># CODE TO RETRIEVE DATA FROM THE WEATHER API AND STORE IT IN A CSV FILE</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># FROM 2019/01/01 TO 2023/03/31</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> requests
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> time
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> datetime <span style="color:#66d9ef">as</span> dt
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> csv 
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>key <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;enJH8FUX2z5Ar7NSCJvYI8pAIuDW0XDV9nbSkEMj&#39;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>start_date <span style="color:#f92672">=</span> dt<span style="color:#f92672">.</span>date(<span style="color:#ae81ff">2019</span>, <span style="color:#ae81ff">1</span>, <span style="color:#ae81ff">1</span>)
+</span></span><span style="display:flex;"><span>end_date <span style="color:#f92672">=</span> dt<span style="color:#f92672">.</span>date(<span style="color:#ae81ff">2023</span>, <span style="color:#ae81ff">3</span>, <span style="color:#ae81ff">31</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">assert</span> start_date <span style="color:#f92672">&lt;</span> end_date, <span style="color:#e6db74">&#39;Start date must be before end date&#39;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>delta <span style="color:#f92672">=</span> dt<span style="color:#f92672">.</span>timedelta(days<span style="color:#f92672">=</span><span style="color:#ae81ff">1</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>freq <span style="color:#f92672">=</span> <span style="color:#ae81ff">1</span><span style="color:#f92672">/</span><span style="color:#ae81ff">20</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>day <span style="color:#f92672">=</span> start_date
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>columns <span style="color:#f92672">=</span> [<span style="color:#e6db74">&#39;timestamp&#39;</span>, <span style="color:#e6db74">&#39;mm_precip&#39;</span>, <span style="color:#e6db74">&#39;temperature&#39;</span>]
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">with</span> open(<span style="color:#e6db74">&#39;weather_data/weather.csv&#39;</span>, mode <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;w&#39;</span>, newline<span style="color:#f92672">=</span><span style="color:#e6db74">&#39;&#39;</span>) <span style="color:#66d9ef">as</span> csvfile:
+</span></span><span style="display:flex;"><span>    writer <span style="color:#f92672">=</span> csv<span style="color:#f92672">.</span>DictWriter(csvfile, fieldnames<span style="color:#f92672">=</span>columns)
+</span></span><span style="display:flex;"><span>    writer<span style="color:#f92672">.</span>writeheader()
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">while</span> day <span style="color:#f92672">&lt;=</span> end_date:
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        day_string <span style="color:#f92672">=</span> day<span style="color:#f92672">.</span>strftime(<span style="color:#e6db74">&#39;%Y/%m/</span><span style="color:#e6db74">%d</span><span style="color:#e6db74">&#39;</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        url <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;https://api.meteo.cat/xema/v1&#39;</span> <span style="color:#f92672">+</span> <span style="color:#e6db74">&#39;/estacions/mesurades/X8/&#39;</span> <span style="color:#f92672">+</span> day_string 
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        print(day_string)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        headers <span style="color:#f92672">=</span> {<span style="color:#e6db74">&#39;Accept&#39;</span>: <span style="color:#e6db74">&#39;application/json&#39;</span>, <span style="color:#e6db74">&#39;X-API-KEY&#39;</span>: key}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        data <span style="color:#f92672">=</span> requests<span style="color:#f92672">.</span>get(url, headers<span style="color:#f92672">=</span>headers)<span style="color:#f92672">.</span>json()[<span style="color:#ae81ff">0</span>]
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e"># the codi variables, 35 and 32, correspond to precipitation and temperature respectively. The json file retrieved</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e"># contains information on many more variables, but we are only interested in these two.</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        precipitation <span style="color:#f92672">=</span> [data[<span style="color:#e6db74">&#39;variables&#39;</span>][i][<span style="color:#e6db74">&#39;lectures&#39;</span>] <span style="color:#66d9ef">for</span> i <span style="color:#f92672">in</span> range(len(data[<span style="color:#e6db74">&#39;variables&#39;</span>])) <span style="color:#66d9ef">if</span> data[<span style="color:#e6db74">&#39;variables&#39;</span>][i][<span style="color:#e6db74">&#39;codi&#39;</span>] <span style="color:#f92672">==</span> <span style="color:#ae81ff">35</span>][<span style="color:#ae81ff">0</span>]
+</span></span><span style="display:flex;"><span>        temperature <span style="color:#f92672">=</span> [data[<span style="color:#e6db74">&#39;variables&#39;</span>][i][<span style="color:#e6db74">&#39;lectures&#39;</span>] <span style="color:#66d9ef">for</span> i <span style="color:#f92672">in</span> range(len(data[<span style="color:#e6db74">&#39;variables&#39;</span>])) <span style="color:#66d9ef">if</span> data[<span style="color:#e6db74">&#39;variables&#39;</span>][i][<span style="color:#e6db74">&#39;codi&#39;</span>] <span style="color:#f92672">==</span> <span style="color:#ae81ff">32</span>][<span style="color:#ae81ff">0</span>]
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        date_variables <span style="color:#f92672">=</span> [{<span style="color:#e6db74">&#39;timestamp&#39;</span>:int(dt<span style="color:#f92672">.</span>datetime<span style="color:#f92672">.</span>strptime(d[<span style="color:#e6db74">&#39;data&#39;</span>], <span style="color:#e6db74">&#39;%Y-%m-</span><span style="color:#e6db74">%d</span><span style="color:#e6db74">T%H:%MZ&#39;</span>)<span style="color:#f92672">.</span>timestamp()), <span style="color:#e6db74">&#39;mm_precip&#39;</span>:d[<span style="color:#e6db74">&#39;valor&#39;</span>]} <span style="color:#66d9ef">for</span> d <span style="color:#f92672">in</span> precipitation]
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">for</span> i <span style="color:#f92672">in</span> range(len(date_variables)):
+</span></span><span style="display:flex;"><span>            date_variables[i][<span style="color:#e6db74">&#39;temperature&#39;</span>] <span style="color:#f92672">=</span> temperature[i][<span style="color:#e6db74">&#39;valor&#39;</span>]
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        writer<span style="color:#f92672">.</span>writerows(date_variables)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        day <span style="color:#f92672">+=</span> delta
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        time<span style="color:#f92672">.</span>sleep(freq)
 </span></span></code></pre></div><h3 id="b-consolidate-the-data">b. Consolidate the Data</h3>
 <p>The consolidation of the Data was built in Tableau using Tableau Prep which give us more flexibility to join, filter and build the next structure according with our metadata-sample-submission.csv</p>
 <h4 id="metadata-sample-submission">Metadata Sample Submission</h4>
@@ -189,173 +251,672 @@
 <p>Data consolidation, visualization and analysis with Tableau</p>
 <h3 id="a-tableau-workflow">a. Tableau Workflow</h3>
 <p>The first flow in Tableau Prep let you consolidate the bicing station status files of all years and create new columns like year, month, day and hour.
-The flow has two subflows because is necesary applied the same process to bicing station 2023 files. Both flows create new files with a hyper format which is easier to manage and control the data.</p>
+The flow has two sub-flows because is necessary applied the same process to bicing station 2023 files. Both flows create new files with a hyper format which is easier to manage and control the data.</p>
 <p><img src="/capstone-project/first-tableau-flow.png" alt="First Tableau flow"></p>
-<p>The second flow in Tableau Prep get the hyper files of bicing station status (2019-2022) to join with the last bicing station information (March, 2023) to get the extra information like longitude, lattitude, name, capacity and postcode.</p>
+<p>The second flow in Tableau Prep get the hyper files of bicing station status (2019-2022) to join with the last bicing station information (March, 2023) to get the extra information like longitude, latitude, name, capacity and postcode.</p>
 <p><img src="/capstone-project/second-tableau-flow.png" alt="Second Tableau flow"></p>
 <p>The same process is applied to the bicing station status 2023 but filtering docks_availability and bike_availability. These fields will be evaluated and predicted by the models.</p>
 <p><img src="/capstone-project/third-tableau-flow.png" alt="Third Tableau flow"></p>
-<p>Finally, the last flow transform the input data of the preview flow using a aggregation to the level year, month, day and hour calculating average of the rest of fields and creating four aditionals fields with the porcent of docks availability in the four hours before.</p>
+<p>Finally, the last flow transform the input data of the preview flow using a aggregation to the level year, month, day and hour calculating average of the rest of fields and creating four additional fields with the percent of docks availability in the four hours before.</p>
 <p><img src="/capstone-project/fourth-tableau-flow.png" alt="Fourth Tableau flow"></p>
 <p>Before training and testing, the data is analyzed to identify patterns, outliers and to visualize relevant features.</p>
 <h3 id="b-analysis-in-tableau">b. Analysis in Tableau</h3>
 <p>Visual analysis of data constructed based on the final output to identify outliers, COVID behaviors and relevant characteristics before training and testing with machine learning models</p>
 <p><img src="/capstone-project/bicing-data-analysis.png" alt="Bicing Data Analysis"></p>
-<p>The theme’s repository is: <a href="https://github.com/526avijitgupta/gokarna">https://github.com/526avijitgupta/gokarna</a>.</p>
-<p>You can download the <a href="https://github.com/526avijitgupta/gokarna/releases">latest release :books: .zip file</a> of the theme and extract it in the <code>themes</code> directory.</p>
-<p>Alternatively, clone this repository to the <code>themes</code> directory:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>git clone https://github.com/526avijitgupta/gokarna.git themes/gokarna
-</span></span></code></pre></div><p>Or, create an empty git repository and make this repository a submodule of your site directory:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>git init
-</span></span><span style="display:flex;"><span>git submodule add https://github.com/526avijitgupta/gokarna.git themes/gokarna
-</span></span></code></pre></div><h3 id="basic-configuration">c. Basic Configuration</h3>
-<p>The following is a basic configuration for the gokarna theme:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-toml" data-lang="toml"><span style="display:flex;"><span><span style="color:#a6e22e">baseURL</span> = <span style="color:#e6db74">&#34;http://example.org/&#34;</span>
-</span></span><span style="display:flex;"><span><span style="color:#a6e22e">defaultContentLanguage</span> = <span style="color:#e6db74">&#34;en&#34;</span>
-</span></span><span style="display:flex;"><span><span style="color:#a6e22e">languageCode</span> = <span style="color:#e6db74">&#34;en&#34;</span>
+<p>With all the consolidate information we start to clean and processes the data to prepare our dataframes of training and testings.</p>
+<h2 id="prepare-the-data-for-machine-learning-algorithms">Prepare the data for Machine Learning algorithms</h2>
+<h3 id="a-importation-of-data-in-colab">a. Importation of data in Colab</h3>
+<p>Importation of Bicing Data and Weather of our Tableau workflow and meteo script in python</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> dask.dataframe <span style="color:#66d9ef">as</span> dd
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> pandas <span style="color:#66d9ef">as</span> pd
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> numpy <span style="color:#66d9ef">as</span> np
+</span></span><span style="display:flex;"><span><span style="color:#f92672">from</span> sklearn.preprocessing <span style="color:#f92672">import</span> FunctionTransformer
+</span></span><span style="display:flex;"><span><span style="color:#f92672">from</span> dask_ml.preprocessing <span style="color:#f92672">import</span> StandardScaler, MinMaxScaler
+</span></span><span style="display:flex;"><span><span style="color:#f92672">from</span> dask_ml.impute <span style="color:#f92672">import</span> SimpleImputer
+</span></span><span style="display:flex;"><span><span style="color:#f92672">from</span> sklearn.pipeline <span style="color:#f92672">import</span> Pipeline
+</span></span><span style="display:flex;"><span><span style="color:#f92672">from</span> sklearn.impute <span style="color:#f92672">import</span> SimpleImputer
+</span></span><span style="display:flex;"><span><span style="color:#f92672">from</span> sklearn.compose <span style="color:#f92672">import</span> ColumnTransformer
+</span></span><span style="display:flex;"><span><span style="color:#f92672">from</span> sklearn.base <span style="color:#f92672">import</span> BaseEstimator, TransformerMixin
+</span></span><span style="display:flex;"><span><span style="color:#f92672">from</span> IPython.display <span style="color:#f92672">import</span> Markdown
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> json
 </span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#a6e22e">title</span> = <span style="color:#e6db74">&#34;My New Hugo Site&#34;</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">####################################################################################################</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># To run in colab</span>
 </span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#a6e22e">theme</span> = <span style="color:#e6db74">&#34;gokarna&#34;</span>
+</span></span><span style="display:flex;"><span>station_dataframe <span style="color:#f92672">=</span> dd<span style="color:#f92672">.</span>read_csv(<span style="color:#e6db74">&#39;/content/drive/MyDrive/CapstoneProject/data_bicing_joined_HX_23.csv&#39;</span>, assume_missing<span style="color:#f92672">=</span><span style="color:#66d9ef">True</span>, delimiter<span style="color:#f92672">=</span><span style="color:#e6db74">&#39;;&#39;</span>)
 </span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#75715e"># Automatically generate robots.txt</span>
-</span></span><span style="display:flex;"><span><span style="color:#a6e22e">enableRobotsTXT</span> = <span style="color:#66d9ef">true</span>
+</span></span><span style="display:flex;"><span>weather_dataframe <span style="color:#f92672">=</span> dd<span style="color:#f92672">.</span>read_csv(<span style="color:#e6db74">&#39;/content/drive/MyDrive/CapstoneProject/weather.csv&#39;</span>, assume_missing<span style="color:#f92672">=</span><span style="color:#66d9ef">True</span>, delimiter<span style="color:#f92672">=</span><span style="color:#e6db74">&#39;,&#39;</span>)
 </span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>[<span style="color:#a6e22e">menu</span>]
-</span></span><span style="display:flex;"><span>  [[<span style="color:#a6e22e">menu</span>.<span style="color:#a6e22e">main</span>]]
-</span></span><span style="display:flex;"><span>    <span style="color:#75715e"># Unique identifier for a menu item</span>
-</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">identifier</span> = <span style="color:#e6db74">&#34;posts&#34;</span>
+</span></span><span style="display:flex;"><span>data_2_predict <span style="color:#f92672">=</span> dd<span style="color:#f92672">.</span>read_csv(<span style="color:#e6db74">&#39;/content/drive/MyDrive/CapstoneProject/metadata_sample_submission.csv&#39;</span>, delimiter<span style="color:#f92672">=</span><span style="color:#e6db74">&#39;,&#39;</span>)
 </span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">url</span> = <span style="color:#e6db74">&#34;/posts/&#34;</span>
-</span></span><span style="display:flex;"><span>    
-</span></span><span style="display:flex;"><span>    <span style="color:#75715e"># You can add extra information before the name (HTML format is supported), such as icons</span>
-</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">pre</span> = <span style="color:#e6db74">&#34;&#34;</span>
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>    <span style="color:#75715e"># You can add extra information after the name (HTML format is supported), such as icons</span>
-</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">post</span> = <span style="color:#e6db74">&#34;&#34;</span>
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>    <span style="color:#75715e"># Display name</span>
-</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">name</span> = <span style="color:#e6db74">&#34;Posts&#34;</span>
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>    <span style="color:#75715e"># Weights are used to determine the ordering</span>
-</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">weight</span> = <span style="color:#ae81ff">1</span>
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>  [[<span style="color:#a6e22e">menu</span>.<span style="color:#a6e22e">main</span>]]
-</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">identifier</span> = <span style="color:#e6db74">&#34;tags&#34;</span>
-</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">name</span> = <span style="color:#e6db74">&#34;Tags&#34;</span>
-</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">url</span> = <span style="color:#e6db74">&#34;/tags/&#34;</span>
-</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">weight</span> = <span style="color:#ae81ff">2</span>
-</span></span><span style="display:flex;"><span>    
-</span></span><span style="display:flex;"><span>  [[<span style="color:#a6e22e">menu</span>.<span style="color:#a6e22e">main</span>]]
-</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">identifier</span> = <span style="color:#e6db74">&#34;github&#34;</span>
-</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">url</span> = <span style="color:#e6db74">&#34;https://github.com&#34;</span>
-</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">weight</span> = <span style="color:#ae81ff">3</span>
-</span></span><span style="display:flex;"><span>    
-</span></span><span style="display:flex;"><span>    <span style="color:#75715e"># We use feather-icons: https://feathericons.com/</span>
-</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">pre</span> = <span style="color:#e6db74">&#34;&lt;span data-feather=&#39;github&#39;&gt;&lt;/span&gt;&#34;</span>
-</span></span></code></pre></div><h3 id="d-create-your-first-post">d. Create Your First Post</h3>
-<p>Here is the way to create your first post:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>hugo new posts/first_post.md
-</span></span></code></pre></div><p>Feel free to edit the post file by adding some sample content and replacing the title value in the beginning of the file.</p>
-<p>For posts you need to add <code>type: &quot;post&quot;</code> in the markdown metadata. We currently support 2 types of content:</p>
-<ol>
-<li>Post (<code>type: &quot;post&quot;</code>): A normal blog-post with tags, date, &amp; content.</li>
-<li>Page (<code>type: &quot;page&quot;</code>): A standalone content page that will just render the markdown you wrote. You can use it to write custom pages which should not be a part of posts. Like showing your projects portfolio. You can read in detail about this on the <a href="/posts/theme-documentation-advanced/#content-types">Theme Documentation - Advanced</a> page.</li>
-</ol>
-<h3 id="e-launching-the-website-locally">e. Launching the Website Locally</h3>
-<p>Launch by using the following command:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>hugo serve
-</span></span></code></pre></div><p>Go to <code>http://localhost:1313</code>.</p>
-<h3 id="f-build-the-website">f. Build the Website</h3>
-<p>When your site is ready to deploy, run the following command:</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>hugo
-</span></span></code></pre></div><p>A <code>public</code> folder will be generated, containing all static content and assets for your website. It can now be deployed on any web server.</p>
-<p>The website can be automatically published and hosted with <a href="https://www.netlify.com/">Netlify</a>, <a href="https://gohugo.io/hosting-and-deployment/hosting-on-aws-amplify/">AWS Amplify</a>, <a href="https://gohugo.io/hosting-and-deployment/hosting-on-github/">Github pages</a>, <a href="https://gohugo.io/hosting-and-deployment/hosting-on-render/">Render</a> and more&hellip;</p>
-<h2 id="configuration">Configuration</h2>
-<p>In addition to <a href="https://gohugo.io/overview/configuration/">Hugo global configuration</a> and <a href="#basic-configuration">menu configuration</a>, <strong>gokarna</strong> lets you define the following parameters in your site configuration (here is a <code>config.toml</code>, whose values are default).</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-toml" data-lang="toml"><span style="display:flex;"><span>[<span style="color:#a6e22e">params</span>]
-</span></span><span style="display:flex;"><span>  <span style="color:#75715e"># URL for the avatar on homepage</span>
-</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">avatarURL</span> = <span style="color:#e6db74">&#34;&#34;</span>
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>  <span style="color:#75715e"># Choose one of size-xs, size-s, size-m, size-l &amp; size-xl. (Default: size-m)</span>
-</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">avatarSize</span> = <span style="color:#e6db74">&#34;&#34;</span>
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>  <span style="color:#75715e"># Description to display on homepage</span>
-</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">description</span> = <span style="color:#e6db74">&#34;Sky above, sand below &amp; peace within&#34;</span>
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>  <span style="color:#75715e"># Accent color is displayed when you hover over &lt;a&gt; tags</span>
-</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">accentColor</span> = <span style="color:#e6db74">&#34;#FF4D4D&#34;</span>
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>  <span style="color:#75715e"># You can use this to inject any HTML in the &lt;head&gt; tag.</span>
-</span></span><span style="display:flex;"><span>  <span style="color:#75715e"># Ideal usecase for this is to import custom js/css or add your analytics snippet</span>
-</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">customHeadHTML</span> = <span style="color:#e6db74">&#34;&#34;</span>
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>  <span style="color:#75715e"># Keywords relevant for SEO</span>
-</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">metaKeywords</span> = [<span style="color:#e6db74">&#34;blog&#34;</span>, <span style="color:#e6db74">&#34;gokarna&#34;</span>, <span style="color:#e6db74">&#34;hugo&#34;</span>]
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>  <span style="color:#75715e"># If you want to display posts on the homepage, the options are</span>
-</span></span><span style="display:flex;"><span>  <span style="color:#75715e"># &#34;popular&#34; (order posts by weight), &#34;recent&#34; (order posts by date)</span>
-</span></span><span style="display:flex;"><span>  <span style="color:#75715e"># or &#34;&#34; (do not display, default option)</span>
-</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">showPostsOnHomePage</span> = <span style="color:#e6db74">&#34;&#34;</span>
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>  <span style="color:#75715e"># Footer text</span>
-</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">footer</span> = <span style="color:#e6db74">&#34;The Marauders&#34;</span>
-</span></span></code></pre></div><h3 id="avatar-url">Avatar URL</h3>
-<p>This is the image url for the avatar on the homepage and the header.</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-toml" data-lang="toml"><span style="display:flex;"><span>[<span style="color:#a6e22e">params</span>]
-</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">avatarURL</span> = <span style="color:#e6db74">&#34;/images/avatar.jpg&#34;</span>
-</span></span></code></pre></div><h3 id="avatar-size">Avatar Size</h3>
-<p>You have an option to change the avatar size on the homepage. Options are: <code>size-xs</code>, <code>size-s</code>, <code>size-m</code>, <code>size-l</code> &amp; <code>size-xl</code>. (Default: <code>size-m</code>)</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-toml" data-lang="toml"><span style="display:flex;"><span>[<span style="color:#a6e22e">params</span>]
-</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">avatarSize</span> = <span style="color:#e6db74">&#34;size-l&#34;</span>
-</span></span></code></pre></div><h3 id="description">Description</h3>
-<p>Description to display on homepage below the title and avatar.</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-toml" data-lang="toml"><span style="display:flex;"><span>[<span style="color:#a6e22e">params</span>]
-</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">description</span> = <span style="color:#e6db74">&#34;Hello, world!&#34;</span>
-</span></span></code></pre></div><h3 id="accent-color">Accent Color</h3>
-<p>Accent color is displayed when you hover over <code>&lt;a&gt;</code> tags. It takes a hex/rgb color code. Default is <code>#FF4D4D</code></p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-toml" data-lang="toml"><span style="display:flex;"><span>[<span style="color:#a6e22e">params</span>]
-</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">accentColor</span> = <span style="color:#e6db74">&#34;#08F&#34;</span>
-</span></span></code></pre></div><h3 id="posts-on-home-page">Posts on home page</h3>
-<p>If you want to display posts on the homepage, the options are:</p>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">####################################################################################################</span>
+</span></span></code></pre></div><h3 id="b-data-cleaning-and-filtering">b. Data Cleaning and Filtering</h3>
 <ul>
-<li><code>popular</code>: Show popular posts on home page if the value is set to popular. It sorts the all the posts by it’s weight attribute in ascending order. Read more about it <a href="/posts/theme-documentation-advanced/#weights">here</a>.</li>
-<li><code>recent</code>: Show recent posts on home page if the value is set to recent</li>
-<li>Do not show anything if the variable is unset or an empty string.</li>
+<li>Initial cleaning to go from the format that the Tableau merger outputs to the one desired for the model</li>
+<li>The objective of this first step is to leave the training data in the same format as the submission one</li>
+<li>Drop all rows with out of service stations and year 2020, to avoid COVID effects on our training data</li>
 </ul>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-toml" data-lang="toml"><span style="display:flex;"><span>[<span style="color:#a6e22e">params</span>]
-</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">showPostsOnHomePage</span> = <span style="color:#e6db74">&#34;popular&#34;</span>
-</span></span></code></pre></div><h3 id="footer">Footer</h3>
-<p>Text to display in the footer section</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-toml" data-lang="toml"><span style="display:flex;"><span>[<span style="color:#a6e22e">params</span>]
-</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">footer</span> = <span style="color:#e6db74">&#34;Text in footer&#34;</span>
-</span></span></code></pre></div><h3 id="previous-and-next-buttons">Previous and Next buttons</h3>
-<p>At the bottom of a post, show the previous and next post chronologically.</p>
-<p><strong>Warning</strong>: Not compatible with the <code>.Weight</code> parameter.</p>
-<p>If any post YAML contains <code>weight:</code>, the posts will not appear by Date. See <a href="https://gohugo.io/templates/lists#default-weight--date--linktitle--filepath">Hugo&rsquo;s default sort</a>.</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-toml" data-lang="toml"><span style="display:flex;"><span>[<span style="color:#a6e22e">params</span>]
-</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">togglePreviousAndNextButtons</span> = <span style="color:#e6db74">&#34;true&#34;</span>
-</span></span></code></pre></div><h3 id="displaying-content-on-the-homepage">Displaying content on the homepage</h3>
-<p>Content to display on homepage below the social icons, using the contents of <code>content/_index.md</code>.</p>
-<h3 id="custom-head-html">Custom Head HTML</h3>
-<p>You can add custom HTML in head section</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-toml" data-lang="toml"><span style="display:flex;"><span>[<span style="color:#a6e22e">params</span>]
-</span></span><span style="display:flex;"><span>  <span style="color:#a6e22e">customHeadHTML</span> = <span style="color:#e6db74">&#34;&lt;script&gt;console.log(&#39;Any HTML&#39;)&lt;/script&gt;&#34;</span>
-</span></span></code></pre></div><p>Read more in the advanced section <a href="/posts/theme-documentation-advanced/#custom-head-html">here</a></p>
-<h3 id="robotstxt">robots.txt</h3>
-<p>Automatically generate robots.txt</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-toml" data-lang="toml"><span style="display:flex;"><span><span style="color:#a6e22e">enableRobotsTXT</span> = <span style="color:#66d9ef">true</span>
-</span></span></code></pre></div><h3 id="favicons-browserconfig-manifest">Favicons, Browserconfig, Manifest</h3>
-<p>It is recommended to put your own favicons:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>station_dataframe <span style="color:#f92672">=</span> station_dataframe<span style="color:#f92672">.</span>loc[station_dataframe[<span style="color:#e6db74">&#39;status&#39;</span>] <span style="color:#f92672">==</span> <span style="color:#e6db74">&#39;IN_SERVICE&#39;</span>]
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">##################################################################################################</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>train_df <span style="color:#f92672">=</span> station_dataframe<span style="color:#f92672">.</span>loc[(station_dataframe[<span style="color:#e6db74">&#39;year&#39;</span>] <span style="color:#f92672">!=</span> <span style="color:#ae81ff">2020</span>) <span style="color:#f92672">&amp;</span> (station_dataframe[<span style="color:#e6db74">&#39;year&#39;</span>] <span style="color:#f92672">!=</span> <span style="color:#ae81ff">2023</span>)]
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>train_df <span style="color:#f92672">=</span> train_df[[<span style="color:#e6db74">&#39;station_id&#39;</span>, <span style="color:#e6db74">&#39;lat&#39;</span>, <span style="color:#e6db74">&#39;lon&#39;</span>, <span style="color:#e6db74">&#39;year&#39;</span>, <span style="color:#e6db74">&#39;month&#39;</span>, <span style="color:#e6db74">&#39;day&#39;</span>, <span style="color:#e6db74">&#39;hour&#39;</span>, <span style="color:#e6db74">&#39;% Docks Availlable&#39;</span>,  <span style="color:#e6db74">&#39;% Docks Available H-4&#39;</span>,<span style="color:#e6db74">&#39;% Docks Available H-3&#39;</span>, <span style="color:#e6db74">&#39;% Docks Available H-2&#39;</span>, <span style="color:#e6db74">&#39;% Docks Available H-1&#39;</span>]]
+</span></span><span style="display:flex;"><span>train_df <span style="color:#f92672">=</span> train_df<span style="color:#f92672">.</span>rename(columns<span style="color:#f92672">=</span>{<span style="color:#e6db74">&#39;% Docks Availlable&#39;</span>: <span style="color:#e6db74">&#39;percentage&#39;</span>})
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">for</span> i <span style="color:#f92672">in</span> range(<span style="color:#ae81ff">1</span>, <span style="color:#ae81ff">5</span>):
+</span></span><span style="display:flex;"><span>    train_df <span style="color:#f92672">=</span> train_df<span style="color:#f92672">.</span>rename(columns<span style="color:#f92672">=</span>{<span style="color:#e6db74">f</span><span style="color:#e6db74">&#39;% Docks Available H-</span><span style="color:#e6db74">{</span>i<span style="color:#e6db74">}</span><span style="color:#e6db74">&#39;</span>: <span style="color:#e6db74">f</span><span style="color:#e6db74">&#39;ctx-</span><span style="color:#e6db74">{</span>i<span style="color:#e6db74">}</span><span style="color:#e6db74">&#39;</span>})
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Print the head of the updated DataFrame</span>
+</span></span><span style="display:flex;"><span>train_df <span style="color:#f92672">=</span> train_df[[<span style="color:#e6db74">&#39;station_id&#39;</span>, <span style="color:#e6db74">&#39;lat&#39;</span>, <span style="color:#e6db74">&#39;lon&#39;</span>, <span style="color:#e6db74">&#39;year&#39;</span>, <span style="color:#e6db74">&#39;month&#39;</span>, <span style="color:#e6db74">&#39;day&#39;</span>, <span style="color:#e6db74">&#39;hour&#39;</span>, <span style="color:#e6db74">&#39;ctx-4&#39;</span>, <span style="color:#e6db74">&#39;ctx-3&#39;</span>, <span style="color:#e6db74">&#39;ctx-2&#39;</span>,	<span style="color:#e6db74">&#39;ctx-1&#39;</span>, <span style="color:#e6db74">&#39;percentage&#39;</span>]]
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>train_df <span style="color:#f92672">=</span> train_df<span style="color:#f92672">.</span>reset_index()
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">##################################################################################################</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>validation_df <span style="color:#f92672">=</span> station_dataframe<span style="color:#f92672">.</span>loc[(station_dataframe[<span style="color:#e6db74">&#39;year&#39;</span>] <span style="color:#f92672">==</span> <span style="color:#ae81ff">2023</span>)]
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>validation_df <span style="color:#f92672">=</span> validation_df[[<span style="color:#e6db74">&#39;station_id&#39;</span>, <span style="color:#e6db74">&#39;lat&#39;</span>, <span style="color:#e6db74">&#39;lon&#39;</span>, <span style="color:#e6db74">&#39;year&#39;</span>, <span style="color:#e6db74">&#39;month&#39;</span>, <span style="color:#e6db74">&#39;day&#39;</span>, <span style="color:#e6db74">&#39;hour&#39;</span>, <span style="color:#e6db74">&#39;% Docks Availlable&#39;</span>,  <span style="color:#e6db74">&#39;% Docks Available H-4&#39;</span>,<span style="color:#e6db74">&#39;% Docks Available H-3&#39;</span>, <span style="color:#e6db74">&#39;% Docks Available H-2&#39;</span>, <span style="color:#e6db74">&#39;% Docks Available H-1&#39;</span>]]
+</span></span><span style="display:flex;"><span>validation_df <span style="color:#f92672">=</span> validation_df<span style="color:#f92672">.</span>rename(columns<span style="color:#f92672">=</span>{<span style="color:#e6db74">&#39;% Docks Availlable&#39;</span>: <span style="color:#e6db74">&#39;percentage&#39;</span>})
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">for</span> i <span style="color:#f92672">in</span> range(<span style="color:#ae81ff">1</span>, <span style="color:#ae81ff">5</span>):
+</span></span><span style="display:flex;"><span>    validation_df <span style="color:#f92672">=</span> validation_df<span style="color:#f92672">.</span>rename(columns<span style="color:#f92672">=</span>{<span style="color:#e6db74">f</span><span style="color:#e6db74">&#39;% Docks Available H-</span><span style="color:#e6db74">{</span>i<span style="color:#e6db74">}</span><span style="color:#e6db74">&#39;</span>: <span style="color:#e6db74">f</span><span style="color:#e6db74">&#39;ctx-</span><span style="color:#e6db74">{</span>i<span style="color:#e6db74">}</span><span style="color:#e6db74">&#39;</span>})
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Print the head of the updated DataFrame</span>
+</span></span><span style="display:flex;"><span>validation_df <span style="color:#f92672">=</span> validation_df[[<span style="color:#e6db74">&#39;station_id&#39;</span>, <span style="color:#e6db74">&#39;lat&#39;</span>, <span style="color:#e6db74">&#39;lon&#39;</span>, <span style="color:#e6db74">&#39;year&#39;</span>, <span style="color:#e6db74">&#39;month&#39;</span>, <span style="color:#e6db74">&#39;day&#39;</span>, <span style="color:#e6db74">&#39;hour&#39;</span>, <span style="color:#e6db74">&#39;ctx-4&#39;</span>, <span style="color:#e6db74">&#39;ctx-3&#39;</span>, <span style="color:#e6db74">&#39;ctx-2&#39;</span>,	<span style="color:#e6db74">&#39;ctx-1&#39;</span>, <span style="color:#e6db74">&#39;percentage&#39;</span>]]
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>validation_df <span style="color:#f92672">=</span> validation_df<span style="color:#f92672">.</span>reset_index()
+</span></span></code></pre></div><h3 id="c-processing-pipelines">c. Processing pipelines</h3>
+<p>Apart from the preprocessing done using tableau to create the initial dataframe, everything else will be done using sklearn pipelines.</p>
+<p>Creation of the 3 pipelines:</p>
 <ul>
-<li>apple-touch-icon.png (180x180)</li>
-<li>favicon-32x32.png (32x32)</li>
-<li>favicon-16x16.png (16x16)</li>
-<li>mstile-150x150.png (150x150)</li>
-<li>android-chrome-192x192.png (192x192)</li>
-<li>android-chrome-512x512.png (512x512)</li>
+<li>train_preparator: to prepare the training data, not used for the submission data as we already have location data</li>
+<li>submisison_preparator: to prepare the submission data, not used for the training data as we don&rsquo;t have location data &ndash;&gt; Not a problem since we are not fitting to any data, just transforming with data we already have</li>
+<li>scaling_pipeline: to fill and scale certain column in the data, used for both training and submission data &ndash;&gt; In this case, we are fitting to the training data, and transforming both training and submission data</li>
 </ul>
-<p>into <code>/static</code> directory. They’re easily created via <a href="https://favicon.io">favicon.io</a> or <a href="https://realfavicongenerator.net/">realfavicongenerator.net</a>.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>train_preparator <span style="color:#f92672">=</span> Pipeline([
+</span></span><span style="display:flex;"><span>    (<span style="color:#e6db74">&#39;weather_merge&#39;</span>, weather_merge_transformer(weather_df<span style="color:#f92672">=</span>weather_prepped)),  <span style="color:#75715e"># weather_merge transformer already includes the creation of the datetime column</span>
+</span></span><span style="display:flex;"><span>    (<span style="color:#e6db74">&#39;extra_time_info&#39;</span>, FunctionTransformer(func<span style="color:#f92672">=</span>extra_time_info)),
+</span></span><span style="display:flex;"><span>    (<span style="color:#e6db74">&#39;hour_selector&#39;</span>, hour_selector_transformer(hour_list<span style="color:#f92672">=</span>[<span style="color:#ae81ff">4</span>, <span style="color:#ae81ff">9</span>, <span style="color:#ae81ff">14</span>, <span style="color:#ae81ff">19</span>, <span style="color:#ae81ff">23</span>])), <span style="color:#75715e"># This obviously restricts the training set, but it prevents</span>
+</span></span><span style="display:flex;"><span>                                                                                <span style="color:#75715e"># the model from seeing data labels before predicting them afterwards</span>
+</span></span><span style="display:flex;"><span>                                                                                <span style="color:#75715e"># It also prevents running out of RAM. A better approach would need to sample all</span>
+</span></span><span style="display:flex;"><span>                                                                                <span style="color:#75715e"># all hours, but it is quite more complicated than this</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    (<span style="color:#e6db74">&#39;time_normalization&#39;</span>, time_norm_transformer(columns<span style="color:#f92672">=</span>[<span style="color:#e6db74">&#39;month&#39;</span>, <span style="color:#e6db74">&#39;day&#39;</span>, <span style="color:#e6db74">&#39;hour&#39;</span>])),
+</span></span><span style="display:flex;"><span>    (<span style="color:#e6db74">&#39;station_id_dropper&#39;</span>, station_id_dropper())
+</span></span><span style="display:flex;"><span>])
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>val_preparator <span style="color:#f92672">=</span> Pipeline([
+</span></span><span style="display:flex;"><span>    (<span style="color:#e6db74">&#39;weather_merge&#39;</span>, weather_merge_transformer(weather_df<span style="color:#f92672">=</span>weather_prepped)),  <span style="color:#75715e"># weather_merge transformer already includes the creation of the datetime column</span>
+</span></span><span style="display:flex;"><span>    (<span style="color:#e6db74">&#39;extra_time_info&#39;</span>, FunctionTransformer(func<span style="color:#f92672">=</span>extra_time_info)),
+</span></span><span style="display:flex;"><span>    (<span style="color:#e6db74">&#39;hour_selector&#39;</span>, hour_selector_transformer(hour_list<span style="color:#f92672">=</span>[i <span style="color:#66d9ef">for</span> i <span style="color:#f92672">in</span> range(<span style="color:#ae81ff">24</span>)])), <span style="color:#75715e"># For the validation part, we will leave one dataset with all the hours and another one</span>
+</span></span><span style="display:flex;"><span>                                                                                    <span style="color:#75715e"># with just the four that appear in the training set to evaluate how this decision affects results</span>
+</span></span><span style="display:flex;"><span>    (<span style="color:#e6db74">&#39;time_normalization&#39;</span>, time_norm_transformer(columns<span style="color:#f92672">=</span>[<span style="color:#e6db74">&#39;month&#39;</span>, <span style="color:#e6db74">&#39;day&#39;</span>, <span style="color:#e6db74">&#39;hour&#39;</span>])),
+</span></span><span style="display:flex;"><span>    (<span style="color:#e6db74">&#39;station_id_dropper&#39;</span>, station_id_dropper())
+</span></span><span style="display:flex;"><span>])
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>submission_preparator <span style="color:#f92672">=</span> Pipeline([
+</span></span><span style="display:flex;"><span>    (<span style="color:#e6db74">&#39;weather_merge&#39;</span>, weather_merge_transformer(weather_df<span style="color:#f92672">=</span>weather_prepped)),  <span style="color:#75715e"># weather_merge transformer already includes the creation of the datetime column&#39;</span>
+</span></span><span style="display:flex;"><span>    (<span style="color:#e6db74">&#39;extra_time_info&#39;</span>, FunctionTransformer(func<span style="color:#f92672">=</span>extra_time_info)),
+</span></span><span style="display:flex;"><span>    (<span style="color:#e6db74">&#39;hour_selector&#39;</span>, hour_selector_transformer(hour_list<span style="color:#f92672">=</span>[i <span style="color:#66d9ef">for</span> i <span style="color:#f92672">in</span> range(<span style="color:#ae81ff">24</span>)])),
+</span></span><span style="display:flex;"><span>    (<span style="color:#e6db74">&#39;time_normalization&#39;</span>, time_norm_transformer(columns<span style="color:#f92672">=</span>[<span style="color:#e6db74">&#39;month&#39;</span>, <span style="color:#e6db74">&#39;day&#39;</span>, <span style="color:#e6db74">&#39;hour&#39;</span>])),
+</span></span><span style="display:flex;"><span>    (<span style="color:#e6db74">&#39;station_loc&#39;</span>, station_loc_transformer(id_lat_lon<span style="color:#f92672">=</span>final_loc)),
+</span></span><span style="display:flex;"><span>    (<span style="color:#e6db74">&#39;station_id_dropper&#39;</span>, station_id_dropper())
+</span></span><span style="display:flex;"><span>])
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>total_columns <span style="color:#f92672">=</span> [<span style="color:#e6db74">&#39;index&#39;</span>,<span style="color:#e6db74">&#39;lat&#39;</span>, <span style="color:#e6db74">&#39;lon&#39;</span>, <span style="color:#e6db74">&#39;ctx-4&#39;</span>, <span style="color:#e6db74">&#39;ctx-3&#39;</span>, <span style="color:#e6db74">&#39;ctx-2&#39;</span>, <span style="color:#e6db74">&#39;ctx-1&#39;</span>,
+</span></span><span style="display:flex;"><span>       <span style="color:#e6db74">&#39;temperature&#39;</span>, <span style="color:#e6db74">&#39;mm_precip&#39;</span>, <span style="color:#e6db74">&#39;temperature-1&#39;</span>, <span style="color:#e6db74">&#39;mm_precip-1&#39;</span>,
+</span></span><span style="display:flex;"><span>       <span style="color:#e6db74">&#39;temperature-2&#39;</span>, <span style="color:#e6db74">&#39;mm_precip-2&#39;</span>, <span style="color:#e6db74">&#39;temperature-3&#39;</span>, <span style="color:#e6db74">&#39;mm_precip-3&#39;</span>,
+</span></span><span style="display:flex;"><span>       <span style="color:#e6db74">&#39;temperature-4&#39;</span>, <span style="color:#e6db74">&#39;mm_precip-4&#39;</span>, <span style="color:#e6db74">&#39;is_weekend&#39;</span>, <span style="color:#e6db74">&#39;timeframe1&#39;</span>,
+</span></span><span style="display:flex;"><span>       <span style="color:#e6db74">&#39;timeframe2&#39;</span>, <span style="color:#e6db74">&#39;timeframe3&#39;</span>, <span style="color:#e6db74">&#39;timeframe4&#39;</span>, <span style="color:#e6db74">&#39;timeframe5&#39;</span>, <span style="color:#e6db74">&#39;cos_month&#39;</span>,
+</span></span><span style="display:flex;"><span>       <span style="color:#e6db74">&#39;sin_month&#39;</span>, <span style="color:#e6db74">&#39;cos_day&#39;</span>, <span style="color:#e6db74">&#39;sin_day&#39;</span>, <span style="color:#e6db74">&#39;cos_hour&#39;</span>, <span style="color:#e6db74">&#39;sin_hour&#39;</span>,
+</span></span><span style="display:flex;"><span>       <span style="color:#e6db74">&#39;year_normed&#39;</span>]
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>to_fill <span style="color:#f92672">=</span> [<span style="color:#e6db74">&#39;index&#39;</span>, <span style="color:#e6db74">&#39;ctx-4&#39;</span>, <span style="color:#e6db74">&#39;ctx-3&#39;</span>, <span style="color:#e6db74">&#39;ctx-2&#39;</span>, <span style="color:#e6db74">&#39;ctx-1&#39;</span>, <span style="color:#e6db74">&#39;is_weekend&#39;</span>, <span style="color:#e6db74">&#39;timeframe1&#39;</span>,
+</span></span><span style="display:flex;"><span>                   <span style="color:#e6db74">&#39;timeframe2&#39;</span>, <span style="color:#e6db74">&#39;timeframe3&#39;</span>, <span style="color:#e6db74">&#39;timeframe4&#39;</span>, <span style="color:#e6db74">&#39;timeframe5&#39;</span>, <span style="color:#e6db74">&#39;cos_month&#39;</span>,
+</span></span><span style="display:flex;"><span>                   <span style="color:#e6db74">&#39;sin_month&#39;</span>, <span style="color:#e6db74">&#39;cos_day&#39;</span>, <span style="color:#e6db74">&#39;sin_day&#39;</span>, <span style="color:#e6db74">&#39;cos_hour&#39;</span>, <span style="color:#e6db74">&#39;sin_hour&#39;</span>,
+</span></span><span style="display:flex;"><span>                   <span style="color:#e6db74">&#39;year_normed&#39;</span>]
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>to_fill_and_scale <span style="color:#f92672">=</span> [<span style="color:#e6db74">&#39;lat&#39;</span>, <span style="color:#e6db74">&#39;lon&#39;</span>, <span style="color:#e6db74">&#39;temperature&#39;</span>, <span style="color:#e6db74">&#39;mm_precip&#39;</span>, <span style="color:#e6db74">&#39;temperature-1&#39;</span>, <span style="color:#e6db74">&#39;mm_precip-1&#39;</span>,
+</span></span><span style="display:flex;"><span>       <span style="color:#e6db74">&#39;temperature-2&#39;</span>, <span style="color:#e6db74">&#39;mm_precip-2&#39;</span>, <span style="color:#e6db74">&#39;temperature-3&#39;</span>, <span style="color:#e6db74">&#39;mm_precip-3&#39;</span>,
+</span></span><span style="display:flex;"><span>       <span style="color:#e6db74">&#39;temperature-4&#39;</span>, <span style="color:#e6db74">&#39;mm_precip-4&#39;</span>]
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>filler <span style="color:#f92672">=</span> Pipeline([
+</span></span><span style="display:flex;"><span>    (<span style="color:#e6db74">&#39;nan_filler&#39;</span>, SimpleImputer(missing_values <span style="color:#f92672">=</span> np<span style="color:#f92672">.</span>nan, strategy<span style="color:#f92672">=</span><span style="color:#e6db74">&#39;median&#39;</span>))
+</span></span><span style="display:flex;"><span>])
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>filler_scaler<span style="color:#f92672">=</span> Pipeline([
+</span></span><span style="display:flex;"><span>    (<span style="color:#e6db74">&#39;nan_filler&#39;</span>, SimpleImputer(missing_values <span style="color:#f92672">=</span> np<span style="color:#f92672">.</span>nan, strategy<span style="color:#f92672">=</span><span style="color:#e6db74">&#39;median&#39;</span>)),
+</span></span><span style="display:flex;"><span>    (<span style="color:#e6db74">&#39;min_max&#39;</span>, MinMaxScaler(feature_range <span style="color:#f92672">=</span> (<span style="color:#f92672">-</span><span style="color:#ae81ff">1</span>,<span style="color:#ae81ff">1</span>)))
+</span></span><span style="display:flex;"><span>])
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>scaling_pipeline <span style="color:#f92672">=</span> ColumnTransformer([
+</span></span><span style="display:flex;"><span>    (<span style="color:#e6db74">&#39;fill&#39;</span>, filler, to_fill),
+</span></span><span style="display:flex;"><span>    (<span style="color:#e6db74">&#39;fill_scale&#39;</span>, filler_scaler, to_fill_and_scale)
+</span></span><span style="display:flex;"><span>])
+</span></span></code></pre></div><h3 id="d-classes-and-functions">d. Classes and Functions</h3>
+<p>Each pipeline is support by a set of functions and classes to structure the data and features</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">def</span> <span style="color:#a6e22e">weather_prep</span>(weather_df:dd) <span style="color:#f92672">-&gt;</span> dd:
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e"># weather dataframe preparator to leave it in the desired format to merge with the station dataframe</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e"># We convert the half hourly data to hourly data by averaging temperature and summing precipitation</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e"># We also add a column with the datetime in order to merge the dataframes</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    weather <span style="color:#f92672">=</span> weather_df<span style="color:#f92672">.</span>copy()
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    weather <span style="color:#f92672">=</span> weather<span style="color:#f92672">.</span>groupby(weather<span style="color:#f92672">.</span>index<span style="color:#f92672">//</span><span style="color:#ae81ff">2</span>)<span style="color:#f92672">.</span>mean()
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    weather[<span style="color:#e6db74">&#39;mm_precip&#39;</span>] <span style="color:#f92672">=</span> weather[<span style="color:#e6db74">&#39;mm_precip&#39;</span>]<span style="color:#f92672">*</span><span style="color:#ae81ff">2</span>
+</span></span><span style="display:flex;"><span>    weather[<span style="color:#e6db74">&#39;timestamp&#39;</span>] <span style="color:#f92672">=</span> (weather[<span style="color:#e6db74">&#39;timestamp&#39;</span>]<span style="color:#f92672">-</span><span style="color:#ae81ff">900</span>)<span style="color:#f92672">.</span>astype(int)
+</span></span><span style="display:flex;"><span>    weather[<span style="color:#e6db74">&#39;datetime&#39;</span>] <span style="color:#f92672">=</span> weather[<span style="color:#e6db74">&#39;timestamp&#39;</span>]<span style="color:#f92672">.</span>map(<span style="color:#66d9ef">lambda</span> x: pd<span style="color:#f92672">.</span>to_datetime(x, unit<span style="color:#f92672">=</span><span style="color:#e6db74">&#39;s&#39;</span>))
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    weather[<span style="color:#e6db74">&#39;timestamp&#39;</span>] <span style="color:#f92672">=</span> weather[<span style="color:#e6db74">&#39;timestamp&#39;</span>]<span style="color:#f92672">.</span>astype(int)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    weather[<span style="color:#e6db74">&#39;datetime&#39;</span>] <span style="color:#f92672">=</span> weather[<span style="color:#e6db74">&#39;timestamp&#39;</span>]<span style="color:#f92672">.</span>map(<span style="color:#66d9ef">lambda</span> x: pd<span style="color:#f92672">.</span>to_datetime(x, unit<span style="color:#f92672">=</span><span style="color:#e6db74">&#39;s&#39;</span>))
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    weather <span style="color:#f92672">=</span> weather<span style="color:#f92672">.</span>drop_duplicates(subset<span style="color:#f92672">=</span>[<span style="color:#e6db74">&#39;timestamp&#39;</span>])
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> weather
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">def</span> <span style="color:#a6e22e">weather_merge</span>(weather_df: dd, station_data: dd) <span style="color:#f92672">-&gt;</span> dd:
+</span></span><span style="display:flex;"><span>    weather <span style="color:#f92672">=</span> weather_df<span style="color:#f92672">.</span>copy()<span style="color:#f92672">.</span>compute()
+</span></span><span style="display:flex;"><span>    stations <span style="color:#f92672">=</span> station_data<span style="color:#f92672">.</span>copy()<span style="color:#f92672">.</span>compute()
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">if</span> <span style="color:#e6db74">&#39;year&#39;</span> <span style="color:#f92672">not</span> <span style="color:#f92672">in</span> stations<span style="color:#f92672">.</span>columns:  <span style="color:#75715e"># the submission df does not contain year, and we need will use that to predict</span>
+</span></span><span style="display:flex;"><span>        stations[<span style="color:#e6db74">&#39;year&#39;</span>] <span style="color:#f92672">=</span> <span style="color:#ae81ff">2023</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    stations[[<span style="color:#e6db74">&#39;year&#39;</span>, <span style="color:#e6db74">&#39;month&#39;</span>, <span style="color:#e6db74">&#39;day&#39;</span>, <span style="color:#e6db74">&#39;hour&#39;</span>]] <span style="color:#f92672">=</span> stations[[<span style="color:#e6db74">&#39;year&#39;</span>, <span style="color:#e6db74">&#39;month&#39;</span>, <span style="color:#e6db74">&#39;day&#39;</span>, <span style="color:#e6db74">&#39;hour&#39;</span>]]<span style="color:#f92672">.</span>astype(int)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    stations[<span style="color:#e6db74">&#39;datetime&#39;</span>] <span style="color:#f92672">=</span> pd<span style="color:#f92672">.</span>to_datetime(stations[<span style="color:#e6db74">&#39;year&#39;</span>]<span style="color:#f92672">.</span>astype(str) <span style="color:#f92672">+</span> <span style="color:#e6db74">&#39;-&#39;</span> <span style="color:#f92672">+</span>
+</span></span><span style="display:flex;"><span>                                        stations[<span style="color:#e6db74">&#39;month&#39;</span>]<span style="color:#f92672">.</span>astype(str) <span style="color:#f92672">+</span> <span style="color:#e6db74">&#39;-&#39;</span> <span style="color:#f92672">+</span>
+</span></span><span style="display:flex;"><span>                                        stations[<span style="color:#e6db74">&#39;day&#39;</span>]<span style="color:#f92672">.</span>astype(str) <span style="color:#f92672">+</span> <span style="color:#e6db74">&#39; &#39;</span> <span style="color:#f92672">+</span>
+</span></span><span style="display:flex;"><span>                                        stations[<span style="color:#e6db74">&#39;hour&#39;</span>]<span style="color:#f92672">.</span>astype(str) <span style="color:#f92672">+</span> <span style="color:#e6db74">&#39;:00:00&#39;</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    weather[<span style="color:#e6db74">&#39;datetime&#39;</span>] <span style="color:#f92672">=</span> pd<span style="color:#f92672">.</span>to_datetime(weather[<span style="color:#e6db74">&#39;datetime&#39;</span>])
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e"># Sorting dataframes by datetime for the asof merge</span>
+</span></span><span style="display:flex;"><span>    weather <span style="color:#f92672">=</span> weather<span style="color:#f92672">.</span>sort_values(<span style="color:#e6db74">&#39;datetime&#39;</span>)
+</span></span><span style="display:flex;"><span>    stations <span style="color:#f92672">=</span> stations<span style="color:#f92672">.</span>sort_values(<span style="color:#e6db74">&#39;datetime&#39;</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e"># Merge for the current datetime</span>
+</span></span><span style="display:flex;"><span>    stations <span style="color:#f92672">=</span> pd<span style="color:#f92672">.</span>merge_asof(stations, weather[[<span style="color:#e6db74">&#39;datetime&#39;</span>, <span style="color:#e6db74">&#39;temperature&#39;</span>, <span style="color:#e6db74">&#39;mm_precip&#39;</span>]], left_on<span style="color:#f92672">=</span><span style="color:#e6db74">&#39;datetime&#39;</span>, right_on<span style="color:#f92672">=</span><span style="color:#e6db74">&#39;datetime&#39;</span>, direction<span style="color:#f92672">=</span><span style="color:#e6db74">&#39;backward&#39;</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e"># Iterate to merge for the preceding datetimes</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">for</span> i <span style="color:#f92672">in</span> range(<span style="color:#ae81ff">1</span>, <span style="color:#ae81ff">5</span>):
+</span></span><span style="display:flex;"><span>        df_weather_shifted <span style="color:#f92672">=</span> weather<span style="color:#f92672">.</span>copy()
+</span></span><span style="display:flex;"><span>        df_weather_shifted[<span style="color:#e6db74">&#39;datetime&#39;</span>] <span style="color:#f92672">+=</span> pd<span style="color:#f92672">.</span>Timedelta(hours<span style="color:#f92672">=</span>i) <span style="color:#75715e"># shift weather data i hours forward</span>
+</span></span><span style="display:flex;"><span>        stations <span style="color:#f92672">=</span> pd<span style="color:#f92672">.</span>merge_asof(stations, df_weather_shifted[[<span style="color:#e6db74">&#39;datetime&#39;</span>, <span style="color:#e6db74">&#39;temperature&#39;</span>, <span style="color:#e6db74">&#39;mm_precip&#39;</span>]], left_on<span style="color:#f92672">=</span><span style="color:#e6db74">&#39;datetime&#39;</span>, right_on<span style="color:#f92672">=</span><span style="color:#e6db74">&#39;datetime&#39;</span>, direction<span style="color:#f92672">=</span><span style="color:#e6db74">&#39;backward&#39;</span>, suffixes<span style="color:#f92672">=</span>(<span style="color:#e6db74">&#39;&#39;</span>, <span style="color:#e6db74">f</span><span style="color:#e6db74">&#39;-</span><span style="color:#e6db74">{</span>i<span style="color:#e6db74">}</span><span style="color:#e6db74">&#39;</span>))
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> dd<span style="color:#f92672">.</span>from_pandas(stations, npartitions<span style="color:#f92672">=</span><span style="color:#ae81ff">5</span>)  <span style="color:#75715e"># Convert back to Dask DataFrame</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">####################################################################################################</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">####################################################################################################</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">class</span> <span style="color:#a6e22e">weather_merge_transformer</span>(BaseEstimator, TransformerMixin):
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">def</span> __init__(self, weather_df:dd, merging_function:callable<span style="color:#f92672">=</span>weather_merge):
+</span></span><span style="display:flex;"><span>        self<span style="color:#f92672">.</span>weather_df <span style="color:#f92672">=</span> weather_df
+</span></span><span style="display:flex;"><span>        self<span style="color:#f92672">.</span>func <span style="color:#f92672">=</span> merging_function
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">fit</span>(self, X, y<span style="color:#f92672">=</span><span style="color:#66d9ef">None</span>):
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> self
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">transform</span>(self, X):
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> self<span style="color:#f92672">.</span>func(self<span style="color:#f92672">.</span>weather_df, X)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">####################################################################################################</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">def</span> <span style="color:#a6e22e">extra_time_info</span>(df:dd) <span style="color:#f92672">-&gt;</span> dd:
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">is_weekend</span>(day_of_week):
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> <span style="color:#ae81ff">1</span> <span style="color:#66d9ef">if</span> day_of_week <span style="color:#f92672">&gt;=</span> <span style="color:#ae81ff">5</span> <span style="color:#66d9ef">else</span> <span style="color:#ae81ff">0</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e"># Create a column to distinguish id ii&#39;s a weekend or not</span>
+</span></span><span style="display:flex;"><span>    df[<span style="color:#e6db74">&#39;is_weekend&#39;</span>] <span style="color:#f92672">=</span> df[<span style="color:#e6db74">&#39;datetime&#39;</span>]<span style="color:#f92672">.</span>dt<span style="color:#f92672">.</span>dayofweek<span style="color:#f92672">.</span>map(is_weekend, meta<span style="color:#f92672">=</span>(<span style="color:#e6db74">&#39;is_weekend&#39;</span>, <span style="color:#e6db74">&#39;int64&#39;</span>))
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e"># Since we will only be working with 5 hours, we add 5 binary columns to indicate in which part of the day we are</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e"># to sort of solve the problem of the missing hours for training</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    df[<span style="color:#e6db74">&#39;timeframe1&#39;</span>] <span style="color:#f92672">=</span> df[<span style="color:#e6db74">&#39;datetime&#39;</span>]<span style="color:#f92672">.</span>dt<span style="color:#f92672">.</span>hour<span style="color:#f92672">.</span>map(<span style="color:#66d9ef">lambda</span> x: <span style="color:#ae81ff">1</span> <span style="color:#66d9ef">if</span> x <span style="color:#f92672">&lt;=</span> <span style="color:#ae81ff">4</span> <span style="color:#66d9ef">else</span> <span style="color:#ae81ff">0</span>, meta<span style="color:#f92672">=</span>(<span style="color:#e6db74">&#39;timeframe1&#39;</span>, <span style="color:#e6db74">&#39;int64&#39;</span>))
+</span></span><span style="display:flex;"><span>    df[<span style="color:#e6db74">&#39;timeframe2&#39;</span>] <span style="color:#f92672">=</span> df[<span style="color:#e6db74">&#39;datetime&#39;</span>]<span style="color:#f92672">.</span>dt<span style="color:#f92672">.</span>hour<span style="color:#f92672">.</span>map(<span style="color:#66d9ef">lambda</span> x: <span style="color:#ae81ff">1</span> <span style="color:#66d9ef">if</span> x <span style="color:#f92672">&gt;=</span> <span style="color:#ae81ff">5</span> <span style="color:#f92672">and</span> x <span style="color:#f92672">&lt;=</span><span style="color:#ae81ff">9</span> <span style="color:#66d9ef">else</span> <span style="color:#ae81ff">0</span>, meta<span style="color:#f92672">=</span>(<span style="color:#e6db74">&#39;timeframe1&#39;</span>, <span style="color:#e6db74">&#39;int64&#39;</span>))
+</span></span><span style="display:flex;"><span>    df[<span style="color:#e6db74">&#39;timeframe3&#39;</span>] <span style="color:#f92672">=</span> df[<span style="color:#e6db74">&#39;datetime&#39;</span>]<span style="color:#f92672">.</span>dt<span style="color:#f92672">.</span>hour<span style="color:#f92672">.</span>map(<span style="color:#66d9ef">lambda</span> x: <span style="color:#ae81ff">1</span> <span style="color:#66d9ef">if</span> x <span style="color:#f92672">&gt;=</span> <span style="color:#ae81ff">10</span> <span style="color:#f92672">and</span> x <span style="color:#f92672">&lt;=</span><span style="color:#ae81ff">14</span> <span style="color:#66d9ef">else</span> <span style="color:#ae81ff">0</span>, meta<span style="color:#f92672">=</span>(<span style="color:#e6db74">&#39;timeframe1&#39;</span>, <span style="color:#e6db74">&#39;int64&#39;</span>))
+</span></span><span style="display:flex;"><span>    df[<span style="color:#e6db74">&#39;timeframe4&#39;</span>] <span style="color:#f92672">=</span> df[<span style="color:#e6db74">&#39;datetime&#39;</span>]<span style="color:#f92672">.</span>dt<span style="color:#f92672">.</span>hour<span style="color:#f92672">.</span>map(<span style="color:#66d9ef">lambda</span> x: <span style="color:#ae81ff">1</span> <span style="color:#66d9ef">if</span> x <span style="color:#f92672">&gt;=</span> <span style="color:#ae81ff">15</span> <span style="color:#f92672">and</span> x <span style="color:#f92672">&lt;=</span><span style="color:#ae81ff">19</span> <span style="color:#66d9ef">else</span> <span style="color:#ae81ff">0</span>, meta<span style="color:#f92672">=</span>(<span style="color:#e6db74">&#39;timeframe1&#39;</span>, <span style="color:#e6db74">&#39;int64&#39;</span>))
+</span></span><span style="display:flex;"><span>    df[<span style="color:#e6db74">&#39;timeframe5&#39;</span>] <span style="color:#f92672">=</span> df[<span style="color:#e6db74">&#39;datetime&#39;</span>]<span style="color:#f92672">.</span>dt<span style="color:#f92672">.</span>hour<span style="color:#f92672">.</span>map(<span style="color:#66d9ef">lambda</span> x: <span style="color:#ae81ff">1</span> <span style="color:#66d9ef">if</span> x <span style="color:#f92672">&gt;=</span> <span style="color:#ae81ff">20</span> <span style="color:#66d9ef">else</span> <span style="color:#ae81ff">0</span>, meta<span style="color:#f92672">=</span>(<span style="color:#e6db74">&#39;timeframe1&#39;</span>, <span style="color:#e6db74">&#39;int64&#39;</span>))
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    df <span style="color:#f92672">=</span> df<span style="color:#f92672">.</span>drop([<span style="color:#e6db74">&#39;datetime&#39;</span>], axis <span style="color:#f92672">=</span> <span style="color:#ae81ff">1</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> df
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">####################################################################################################</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">def</span> <span style="color:#a6e22e">station_loc</span>(id_lat_lon:dd, df:dd) <span style="color:#f92672">-&gt;</span> dd: <span style="color:#75715e">#this should be applied for the 2023 march dataset to predict from station_id-location paris from february 2023</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e"># station location adder from the february 2023 dataset to substitute station_id for locations</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">assert</span> all(item <span style="color:#f92672">in</span> list(id_lat_lon<span style="color:#f92672">.</span>columns) <span style="color:#66d9ef">for</span> item <span style="color:#f92672">in</span> [<span style="color:#e6db74">&#39;station_id&#39;</span>, <span style="color:#e6db74">&#39;lat&#39;</span>, <span style="color:#e6db74">&#39;lon&#39;</span>]), <span style="color:#e6db74">&#39;id_lat_lon must contain station_id, lat and lon columns&#39;</span>
+</span></span><span style="display:flex;"><span>    id_locator <span style="color:#f92672">=</span> id_lat_lon<span style="color:#f92672">.</span>copy()
+</span></span><span style="display:flex;"><span>    data <span style="color:#f92672">=</span> df<span style="color:#f92672">.</span>copy()
+</span></span><span style="display:flex;"><span>    id_locator <span style="color:#f92672">=</span> id_locator<span style="color:#f92672">.</span>drop_duplicates(subset<span style="color:#f92672">=</span>[<span style="color:#e6db74">&#39;station_id&#39;</span>])
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    data <span style="color:#f92672">=</span> data<span style="color:#f92672">.</span>merge(id_locator[[<span style="color:#e6db74">&#39;station_id&#39;</span>, <span style="color:#e6db74">&#39;lat&#39;</span>, <span style="color:#e6db74">&#39;lon&#39;</span>]], on<span style="color:#f92672">=</span><span style="color:#e6db74">&#39;station_id&#39;</span>, how<span style="color:#f92672">=</span><span style="color:#e6db74">&#39;left&#39;</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> data
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">class</span> <span style="color:#a6e22e">station_loc_transformer</span>(BaseEstimator, TransformerMixin):
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">def</span> __init__(self, id_lat_lon:dd, merging_function:callable<span style="color:#f92672">=</span>station_loc):
+</span></span><span style="display:flex;"><span>        self<span style="color:#f92672">.</span>id_lat_lon <span style="color:#f92672">=</span> id_lat_lon
+</span></span><span style="display:flex;"><span>        self<span style="color:#f92672">.</span>func <span style="color:#f92672">=</span> merging_function
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">fit</span>(self, X, y<span style="color:#f92672">=</span><span style="color:#66d9ef">None</span>):
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> self
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">transform</span>(self, X):
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> self<span style="color:#f92672">.</span>func(self<span style="color:#f92672">.</span>id_lat_lon, X)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">####################################################################################################</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">def</span> <span style="color:#a6e22e">hour_selector</span>(df:dd, hour_list:list) <span style="color:#f92672">-&gt;</span> dd:
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e"># Hour selector function to select only the hours we want to train on</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e"># in our case we will only train on 5 hours of the day, but a more complicated function</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e"># that would cover all hours could also be constructed</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    data <span style="color:#f92672">=</span> df<span style="color:#f92672">.</span>copy()
+</span></span><span style="display:flex;"><span>    data <span style="color:#f92672">=</span> data<span style="color:#f92672">.</span>loc[data[<span style="color:#e6db74">&#39;hour&#39;</span>]<span style="color:#f92672">.</span>isin(hour_list)]
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> data
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">class</span> <span style="color:#a6e22e">hour_selector_transformer</span>(BaseEstimator, TransformerMixin):
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">def</span> __init__(self, hour_list:list):
+</span></span><span style="display:flex;"><span>        self<span style="color:#f92672">.</span>hour_list <span style="color:#f92672">=</span> hour_list
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">fit</span>(self, X, y<span style="color:#f92672">=</span><span style="color:#66d9ef">None</span>):
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> self
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">transform</span>(self, X):
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> hour_selector(X, self<span style="color:#f92672">.</span>hour_list)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">####################################################################################################</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">def</span> <span style="color:#a6e22e">time_norm</span>(df:dd, columns:list) <span style="color:#f92672">-&gt;</span> dd:
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e"># Time normalizer function to normalize the time columns to a 0-1 scale with periodicity</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e"># This is done by applying a sin and cos transformation to the columns</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    data <span style="color:#f92672">=</span> df<span style="color:#f92672">.</span>copy()
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">for</span> col <span style="color:#f92672">in</span> columns:
+</span></span><span style="display:flex;"><span>        data[<span style="color:#e6db74">&#39;cos_&#39;</span><span style="color:#f92672">+</span>col] <span style="color:#f92672">=</span> np<span style="color:#f92672">.</span>cos(<span style="color:#ae81ff">2</span><span style="color:#f92672">*</span>np<span style="color:#f92672">.</span>pi<span style="color:#f92672">*</span>data[col]<span style="color:#f92672">/</span>data[col]<span style="color:#f92672">.</span>max())
+</span></span><span style="display:flex;"><span>        data[<span style="color:#e6db74">&#39;sin_&#39;</span><span style="color:#f92672">+</span>col] <span style="color:#f92672">=</span> np<span style="color:#f92672">.</span>sin(<span style="color:#ae81ff">2</span><span style="color:#f92672">*</span>np<span style="color:#f92672">.</span>pi<span style="color:#f92672">*</span>data[col]<span style="color:#f92672">/</span>data[col]<span style="color:#f92672">.</span>max())
+</span></span><span style="display:flex;"><span>        data <span style="color:#f92672">=</span> data<span style="color:#f92672">.</span>drop([col], axis<span style="color:#f92672">=</span><span style="color:#ae81ff">1</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    data[<span style="color:#e6db74">&#39;year_normed&#39;</span>] <span style="color:#f92672">=</span> (data[<span style="color:#e6db74">&#39;year&#39;</span>]<span style="color:#f92672">-</span><span style="color:#ae81ff">2019</span>)<span style="color:#f92672">/</span><span style="color:#ae81ff">4</span>
+</span></span><span style="display:flex;"><span>    data <span style="color:#f92672">=</span> data<span style="color:#f92672">.</span>drop([<span style="color:#e6db74">&#39;year&#39;</span>], axis <span style="color:#f92672">=</span> <span style="color:#ae81ff">1</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> data
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">class</span> <span style="color:#a6e22e">time_norm_transformer</span>(BaseEstimator, TransformerMixin):
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">def</span> __init__(self, columns: list, norm_function: callable<span style="color:#f92672">=</span>time_norm):
+</span></span><span style="display:flex;"><span>        self<span style="color:#f92672">.</span>columns <span style="color:#f92672">=</span> columns
+</span></span><span style="display:flex;"><span>        self<span style="color:#f92672">.</span>func <span style="color:#f92672">=</span> norm_function
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">fit</span>(self, X, y<span style="color:#f92672">=</span><span style="color:#66d9ef">None</span>):
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> self
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">transform</span>(self, X):
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> self<span style="color:#f92672">.</span>func(X, self<span style="color:#f92672">.</span>columns)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">####################################################################################################</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">class</span> <span style="color:#a6e22e">station_id_dropper</span>(BaseEstimator, TransformerMixin):
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e"># Station id dropper function to drop the station_id column from the dataset at the end of the pipeline</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e"># prediction will be done on the location of the stations, not on the id</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">fit</span>(self, X, y<span style="color:#f92672">=</span><span style="color:#66d9ef">None</span>):
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> self
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">transform</span>(self, X):
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> X<span style="color:#f92672">.</span>drop([<span style="color:#e6db74">&#39;station_id&#39;</span>], axis<span style="color:#f92672">=</span><span style="color:#ae81ff">1</span>)
+</span></span><span style="display:flex;"><span>		
+</span></span></code></pre></div><h3 id="e-prepare-all-data-and-load-data-that-has-been-saved">e. Prepare all data and load data that has been saved</h3>
+<p>The following code load the data has been saved in the prepped_data folder, so there is no need to run this code again. We will just load it from our folder to work with the models</p>
+<p>We have 3 datasets. The first is to train, the second consider only a range of hours to not overlap the data with the columns and the last dataset is our test which is loaded in Kaggle</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>X_submission <span style="color:#f92672">=</span> pd<span style="color:#f92672">.</span>read_csv(<span style="color:#e6db74">&#39;/content/drive/MyDrive/CapstoneProject/prepped_data/X_submission.csv&#39;</span>)
+</span></span><span style="display:flex;"><span>X_train <span style="color:#f92672">=</span> pd<span style="color:#f92672">.</span>read_csv(<span style="color:#e6db74">&#39;/content/drive/MyDrive/CapstoneProject/prepped_data/X_train.csv&#39;</span>, delimiter <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;,&#39;</span>)<span style="color:#f92672">.</span>drop(<span style="color:#e6db74">&#39;index&#39;</span>, axis <span style="color:#f92672">=</span> <span style="color:#ae81ff">1</span>)
+</span></span><span style="display:flex;"><span>y_train <span style="color:#f92672">=</span> pd<span style="color:#f92672">.</span>read_csv(<span style="color:#e6db74">&#39;/content/drive/MyDrive/CapstoneProject/prepped_data/y_train.csv&#39;</span>, delimiter <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;,&#39;</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Validation taked 5 hours</span>
+</span></span><span style="display:flex;"><span>X_val <span style="color:#f92672">=</span> pd<span style="color:#f92672">.</span>read_csv(<span style="color:#e6db74">&#39;/content/drive/MyDrive/CapstoneProject/prepped_data/X_val.csv&#39;</span>, delimiter <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;,&#39;</span>)<span style="color:#f92672">.</span>drop(<span style="color:#e6db74">&#39;index&#39;</span>, axis <span style="color:#f92672">=</span> <span style="color:#ae81ff">1</span>)
+</span></span><span style="display:flex;"><span>y_val <span style="color:#f92672">=</span> pd<span style="color:#f92672">.</span>read_csv(<span style="color:#e6db74">&#39;/content/drive/MyDrive/CapstoneProject/prepped_data/y_val.csv&#39;</span>, delimiter <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;,&#39;</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Validation taked 24 hours</span>
+</span></span><span style="display:flex;"><span>X_val24 <span style="color:#f92672">=</span> pd<span style="color:#f92672">.</span>read_csv(<span style="color:#e6db74">&#39;/content/drive/MyDrive/CapstoneProject/prepped_data/X_val24.csv&#39;</span>, delimiter <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;,&#39;</span>)<span style="color:#f92672">.</span>drop(<span style="color:#e6db74">&#39;index&#39;</span>, axis <span style="color:#f92672">=</span> <span style="color:#ae81ff">1</span>)
+</span></span><span style="display:flex;"><span>y_val24 <span style="color:#f92672">=</span> pd<span style="color:#f92672">.</span>read_csv(<span style="color:#e6db74">&#39;/content/drive/MyDrive/CapstoneProject/prepped_data/y_val24.csv&#39;</span>, delimiter <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;,&#39;</span>)
+</span></span></code></pre></div><h4 id="training-dataset">Training Dataset</h4>
+<p><img src="/capstone-project/x-train.png" alt="X-Train dataset"></p>
+<h4 id="validation-dataset-5-hr">Validation Dataset (5 hr)</h4>
+<p><img src="/capstone-project/x-val.png" alt="X-Val dataset"></p>
+<h4 id="validation-dataset-with-all-hours-24-hr">Validation Dataset with all hours (24 hr)</h4>
+<p><img src="/capstone-project/x-val24.png" alt="X-Val24 dataset"></p>
+<h4 id="submission-dataset-testing-dataset">Submission Dataset (Testing Dataset)</h4>
+<p><img src="/capstone-project/x-submission.png" alt="X-Submission dataset"></p>
+<h2 id="model-selection-and-training">Model Selection and Training</h2>
+<p>For this project we will use 2 different models. The first one is an xgboost regressor, that has been chosen following other similar projects to this one and that has outperformed with less training times other similar ensemble models. Then, a neural network containing LSTM layers is used to capture the temporal features and their ordering.</p>
+<h3 id="a-xgbregressor">a. XGBregressor</h3>
+<p>We will first use a data subset to perform a grid search on the parameter space to find the ones that fit the best our xgboost model.</p>
+<h4 id="randomizedsearchcv-and-gridsearchcv">RandomizedSearchCV and GridSearchCV</h4>
+<p>We apply both techniques to find the best parameters to our model after to transform our data with the pipelines</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> xgboost <span style="color:#66d9ef">as</span> xgb
+</span></span><span style="display:flex;"><span><span style="color:#f92672">from</span> xgboost <span style="color:#f92672">import</span> XGBRegressor
+</span></span><span style="display:flex;"><span><span style="color:#f92672">from</span> sklearn.metrics <span style="color:#f92672">import</span> mean_squared_error
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> json
+</span></span><span style="display:flex;"><span><span style="color:#f92672">from</span> sklearn.model_selection <span style="color:#f92672">import</span> RandomizedSearchCV, GridSearchCV
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">from</span> sklearn.model_selection <span style="color:#f92672">import</span> RandomizedSearchCV, GridSearchCV
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>gs_subset <span style="color:#f92672">=</span> X_train[X_train[<span style="color:#e6db74">&#39;year_normed&#39;</span>] <span style="color:#f92672">==</span> <span style="color:#ae81ff">0.75</span>]<span style="color:#f92672">.</span>sample(frac <span style="color:#f92672">=</span> <span style="color:#ae81ff">0.005</span>, random_state <span style="color:#f92672">=</span> <span style="color:#ae81ff">5</span>) <span style="color:#75715e"># to restrict ourselves to more relevant data, we focus on 2022</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>y_subset <span style="color:#f92672">=</span> y_train<span style="color:#f92672">.</span>loc[gs_subset<span style="color:#f92672">.</span>index]
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>space <span style="color:#f92672">=</span> {
+</span></span><span style="display:flex;"><span>    <span style="color:#e6db74">&#39;learning_rate&#39;</span>: [<span style="color:#ae81ff">0.1</span>, <span style="color:#ae81ff">0.01</span>, <span style="color:#ae81ff">0.001</span>],
+</span></span><span style="display:flex;"><span>    <span style="color:#e6db74">&#39;max_depth&#39;</span>: [<span style="color:#ae81ff">3</span>, <span style="color:#ae81ff">5</span>, <span style="color:#ae81ff">7</span>],
+</span></span><span style="display:flex;"><span>    <span style="color:#e6db74">&#39;subsample&#39;</span>: [<span style="color:#ae81ff">0.8</span>, <span style="color:#ae81ff">0.9</span>, <span style="color:#ae81ff">1.0</span>],
+</span></span><span style="display:flex;"><span>    <span style="color:#e6db74">&#39;reg_lambda&#39;</span>: [<span style="color:#ae81ff">0.1</span>, <span style="color:#ae81ff">1.0</span>, <span style="color:#ae81ff">10.0</span>],
+</span></span><span style="display:flex;"><span>    <span style="color:#e6db74">&#39;reg_alpha&#39;</span>: [<span style="color:#ae81ff">0</span>, <span style="color:#ae81ff">0.1</span>, <span style="color:#ae81ff">1.0</span>],
+</span></span><span style="display:flex;"><span>    <span style="color:#e6db74">&#39;n_estimators&#39;</span>: [<span style="color:#ae81ff">30</span>, <span style="color:#ae81ff">50</span>, <span style="color:#ae81ff">100</span>, <span style="color:#ae81ff">200</span>]
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>xgb_model <span style="color:#f92672">=</span> XGBRegressor(objective<span style="color:#f92672">=</span><span style="color:#e6db74">&#39;reg:squarederror&#39;</span>, random_state <span style="color:#f92672">=</span> <span style="color:#ae81ff">40</span>)
+</span></span><span style="display:flex;"><span>grid_search <span style="color:#f92672">=</span> GridSearchCV(estimator<span style="color:#f92672">=</span>xgb_model, param_grid<span style="color:#f92672">=</span>space, scoring<span style="color:#f92672">=</span><span style="color:#e6db74">&#39;neg_mean_squared_error&#39;</span>, cv<span style="color:#f92672">=</span><span style="color:#ae81ff">2</span>, verbose<span style="color:#f92672">=</span><span style="color:#ae81ff">2</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>grid_search<span style="color:#f92672">.</span>fit(gs_subset, y_subset)
+</span></span></code></pre></div><p>Best parameters result</p>
+<p><img src="/capstone-project/grdsearch-best-parameters.png" alt="Best Parameters GridSearch"></p>
+<p>Now that we have the best parameters for our subset of data we train the model. We also use the validation dataset to monitor the performance of the model during training to look for over-fitting curves</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>xgb_model <span style="color:#f92672">=</span> XGBRegressor(objective<span style="color:#f92672">=</span><span style="color:#e6db74">&#39;reg:squarederror&#39;</span>, colsample_bytree<span style="color:#f92672">=</span><span style="color:#ae81ff">0.8</span>, gamma<span style="color:#f92672">=</span><span style="color:#ae81ff">0.1</span>, n_jobs<span style="color:#f92672">=-</span><span style="color:#ae81ff">1</span>, random_state<span style="color:#f92672">=</span><span style="color:#ae81ff">123</span>, eval_metric <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;rmse&#39;</span>, early_stopping_rounds <span style="color:#f92672">=</span> <span style="color:#ae81ff">30</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">with</span> open(<span style="color:#e6db74">&#39;/content/drive/MyDrive/CapstoneProject/xgboost models/best_params.json&#39;</span>, <span style="color:#e6db74">&#39;r&#39;</span>) <span style="color:#66d9ef">as</span> f:
+</span></span><span style="display:flex;"><span>  best_params <span style="color:#f92672">=</span> json<span style="color:#f92672">.</span>load(f)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>xgb_model<span style="color:#f92672">.</span>set_params(<span style="color:#f92672">**</span>best_params)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>evalset <span style="color:#f92672">=</span> [(X_train, y_train), (X_val, y_val), (X_val24, y_val24)]
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>xgb_model<span style="color:#f92672">.</span>fit(X_train, y_train, eval_set <span style="color:#f92672">=</span> evalset)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>y_pred <span style="color:#f92672">=</span> xgb_model<span style="color:#f92672">.</span>predict(X_val)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>rmse <span style="color:#f92672">=</span> np<span style="color:#f92672">.</span>sqrt(mean_squared_error(y_true <span style="color:#f92672">=</span> y_val, y_pred <span style="color:#f92672">=</span> y_pred))
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>print(<span style="color:#e6db74">&#39;rmse:&#39;</span>, rmse)
+</span></span></code></pre></div><p>Once we have trained the model, we are interested in knowing how the loss evolved during training, as well as what variables were the most relevant to predict the percentage of available docks</p>
+<h4 id="loss-function-graphic">Loss Function Graphic</h4>
+<p><img src="/capstone-project/loss-function-xgboost.png" alt="Loss Function graphic"></p>
+<h4 id="most-relevant-features">Most Relevant Features</h4>
+<p><img src="/capstone-project/feature-importance-xgboost.png" alt="Feature Importances Graphic"></p>
+<p>The feature important plot is really interesting. From it we can conclude that:</p>
+<ul>
+<li>A expected, the previous hours percentage gives a lot of info about how many docks will be available in the following hours.</li>
+<li>The location of the station are the next most relevant features. The usage of the service is not homogeneous across the city and this impacts to availability of docks</li>
+<li>timeframe2, corresponding to peak hours in the morning has quite a bit of weight. The stations network probably has the most activity in these hours</li>
+<li>the hour also affects quite a bit the final %, as expected &ndash;&gt; Since we are only training with</li>
+<li>The weather does not even appear in the graph. We expected way more weight from those variables, especially rain. We guess that since Barcelona is not a very rainy city, the model does not see many registers with rain and so it end up ignoring completely the variable</li>
+</ul>
+<h3 id="b-lstm">b. LSTM</h3>
+<p>Apart from our xgbregressor model, and since our data contains historical data, we have also tried to study the prediction problem as a time-series analysis by working with long short-term memory layers on a neural network to try and exploit the temporal ordering of the information. Since not all the variables are historical, that have built a time series with just the one that are historical context, and we have treated the rest with a fully connected network. By using this approach our intention is to capture not only the static context of the data, but also the past that leads to each station&rsquo;s state.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> numpy <span style="color:#66d9ef">as</span> np
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> pandas <span style="color:#66d9ef">as</span> pd
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> tensorflow <span style="color:#66d9ef">as</span> tf
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Assuming your dataframe is named &#39;df&#39;</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Extract the static data, the target and the time series data in seperate arrays</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>X_submission <span style="color:#f92672">=</span> pd<span style="color:#f92672">.</span>read_csv(<span style="color:#e6db74">&#39;/content/drive/MyDrive/CapstoneProject/prepped_data/X_submission.csv&#39;</span>)
+</span></span><span style="display:flex;"><span>X_train <span style="color:#f92672">=</span> pd<span style="color:#f92672">.</span>read_csv(<span style="color:#e6db74">&#39;/content/drive/MyDrive/CapstoneProject/prepped_data/X_train.csv&#39;</span>, delimiter <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;,&#39;</span>)<span style="color:#f92672">.</span>drop(<span style="color:#e6db74">&#39;index&#39;</span>, axis <span style="color:#f92672">=</span> <span style="color:#ae81ff">1</span>)
+</span></span><span style="display:flex;"><span>y_train <span style="color:#f92672">=</span> pd<span style="color:#f92672">.</span>read_csv(<span style="color:#e6db74">&#39;/content/drive/MyDrive/CapstoneProject/prepped_data/y_train.csv&#39;</span>, delimiter <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;,&#39;</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>X_val <span style="color:#f92672">=</span> pd<span style="color:#f92672">.</span>read_csv(<span style="color:#e6db74">&#39;/content/drive/MyDrive/CapstoneProject/prepped_data/X_val.csv&#39;</span>, delimiter <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;,&#39;</span>)<span style="color:#f92672">.</span>drop(<span style="color:#e6db74">&#39;index&#39;</span>, axis <span style="color:#f92672">=</span> <span style="color:#ae81ff">1</span>)
+</span></span><span style="display:flex;"><span>y_val <span style="color:#f92672">=</span> pd<span style="color:#f92672">.</span>read_csv(<span style="color:#e6db74">&#39;/content/drive/MyDrive/CapstoneProject/prepped_data/y_val.csv&#39;</span>, delimiter <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;,&#39;</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>X_val24 <span style="color:#f92672">=</span> pd<span style="color:#f92672">.</span>read_csv(<span style="color:#e6db74">&#39;/content/drive/MyDrive/CapstoneProject/prepped_data/X_val24.csv&#39;</span>, delimiter <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;,&#39;</span>)<span style="color:#f92672">.</span>drop(<span style="color:#e6db74">&#39;index&#39;</span>, axis <span style="color:#f92672">=</span> <span style="color:#ae81ff">1</span>)
+</span></span><span style="display:flex;"><span>y_val24 <span style="color:#f92672">=</span> pd<span style="color:#f92672">.</span>read_csv(<span style="color:#e6db74">&#39;/content/drive/MyDrive/CapstoneProject/prepped_data/y_val24.csv&#39;</span>, delimiter <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;,&#39;</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">#################################################################################</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>static_columns <span style="color:#f92672">=</span> [<span style="color:#e6db74">&#39;is_weekend&#39;</span>, <span style="color:#e6db74">&#39;timeframe1&#39;</span>,
+</span></span><span style="display:flex;"><span>       <span style="color:#e6db74">&#39;timeframe2&#39;</span>, <span style="color:#e6db74">&#39;timeframe3&#39;</span>, <span style="color:#e6db74">&#39;timeframe4&#39;</span>, <span style="color:#e6db74">&#39;timeframe5&#39;</span>, <span style="color:#e6db74">&#39;cos_month&#39;</span>,
+</span></span><span style="display:flex;"><span>       <span style="color:#e6db74">&#39;sin_month&#39;</span>, <span style="color:#e6db74">&#39;cos_day&#39;</span>, <span style="color:#e6db74">&#39;sin_day&#39;</span>, <span style="color:#e6db74">&#39;cos_hour&#39;</span>, <span style="color:#e6db74">&#39;sin_hour&#39;</span>,
+</span></span><span style="display:flex;"><span>       <span style="color:#e6db74">&#39;year_normed&#39;</span>, <span style="color:#e6db74">&#39;lat&#39;</span>, <span style="color:#e6db74">&#39;lon&#39;</span>, <span style="color:#e6db74">&#39;temperature&#39;</span>, <span style="color:#e6db74">&#39;mm_precip&#39;</span>]
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>X_train_static <span style="color:#f92672">=</span> X_train[static_columns]<span style="color:#f92672">.</span>values
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>X_train_ts <span style="color:#f92672">=</span> np<span style="color:#f92672">.</span>stack((X_train[[<span style="color:#e6db74">&#39;temperature-1&#39;</span>, <span style="color:#e6db74">&#39;mm_precip-1&#39;</span>, <span style="color:#e6db74">&#39;ctx-1&#39;</span>]]<span style="color:#f92672">.</span>values,
+</span></span><span style="display:flex;"><span>                       X_train[[<span style="color:#e6db74">&#39;temperature-2&#39;</span>, <span style="color:#e6db74">&#39;mm_precip-2&#39;</span>, <span style="color:#e6db74">&#39;ctx-2&#39;</span>]]<span style="color:#f92672">.</span>values,
+</span></span><span style="display:flex;"><span>                       X_train[[<span style="color:#e6db74">&#39;temperature-3&#39;</span>, <span style="color:#e6db74">&#39;mm_precip-3&#39;</span>, <span style="color:#e6db74">&#39;ctx-3&#39;</span>]]<span style="color:#f92672">.</span>values,
+</span></span><span style="display:flex;"><span>                       X_train[[<span style="color:#e6db74">&#39;temperature-4&#39;</span>, <span style="color:#e6db74">&#39;mm_precip-4&#39;</span>, <span style="color:#e6db74">&#39;ctx-4&#39;</span>]]<span style="color:#f92672">.</span>values),
+</span></span><span style="display:flex;"><span>                       axis <span style="color:#f92672">=</span> <span style="color:#ae81ff">1</span>)
+</span></span><span style="display:flex;"><span>train_target <span style="color:#f92672">=</span> y_train[[<span style="color:#e6db74">&#39;percentage&#39;</span>]]<span style="color:#f92672">.</span>values
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">#################################################################################</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>X_val_static <span style="color:#f92672">=</span> X_val[static_columns]<span style="color:#f92672">.</span>values
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>X_val_ts <span style="color:#f92672">=</span> np<span style="color:#f92672">.</span>stack((X_val[[<span style="color:#e6db74">&#39;temperature-1&#39;</span>, <span style="color:#e6db74">&#39;mm_precip-1&#39;</span>, <span style="color:#e6db74">&#39;ctx-1&#39;</span>]]<span style="color:#f92672">.</span>values,
+</span></span><span style="display:flex;"><span>                     X_val[[<span style="color:#e6db74">&#39;temperature-2&#39;</span>, <span style="color:#e6db74">&#39;mm_precip-2&#39;</span>, <span style="color:#e6db74">&#39;ctx-2&#39;</span>]]<span style="color:#f92672">.</span>values,
+</span></span><span style="display:flex;"><span>                     X_val[[<span style="color:#e6db74">&#39;temperature-3&#39;</span>, <span style="color:#e6db74">&#39;mm_precip-3&#39;</span>, <span style="color:#e6db74">&#39;ctx-3&#39;</span>]]<span style="color:#f92672">.</span>values,
+</span></span><span style="display:flex;"><span>                     X_val[[<span style="color:#e6db74">&#39;temperature-4&#39;</span>, <span style="color:#e6db74">&#39;mm_precip-4&#39;</span>, <span style="color:#e6db74">&#39;ctx-4&#39;</span>]]<span style="color:#f92672">.</span>values),
+</span></span><span style="display:flex;"><span>                     axis <span style="color:#f92672">=</span> <span style="color:#ae81ff">1</span>)
+</span></span><span style="display:flex;"><span>val_target <span style="color:#f92672">=</span> y_val[[<span style="color:#e6db74">&#39;percentage&#39;</span>]]<span style="color:#f92672">.</span>values
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">#################################################################################</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>X_val24_static <span style="color:#f92672">=</span> X_val24[static_columns]<span style="color:#f92672">.</span>values
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>X_val24_ts <span style="color:#f92672">=</span> np<span style="color:#f92672">.</span>stack((X_val24[[<span style="color:#e6db74">&#39;temperature-1&#39;</span>, <span style="color:#e6db74">&#39;mm_precip-1&#39;</span>, <span style="color:#e6db74">&#39;ctx-1&#39;</span>]]<span style="color:#f92672">.</span>values,
+</span></span><span style="display:flex;"><span>                       X_val24[[<span style="color:#e6db74">&#39;temperature-2&#39;</span>, <span style="color:#e6db74">&#39;mm_precip-2&#39;</span>, <span style="color:#e6db74">&#39;ctx-2&#39;</span>]]<span style="color:#f92672">.</span>values,
+</span></span><span style="display:flex;"><span>                       X_val24[[<span style="color:#e6db74">&#39;temperature-3&#39;</span>, <span style="color:#e6db74">&#39;mm_precip-3&#39;</span>, <span style="color:#e6db74">&#39;ctx-3&#39;</span>]]<span style="color:#f92672">.</span>values,
+</span></span><span style="display:flex;"><span>                       X_val24[[<span style="color:#e6db74">&#39;temperature-4&#39;</span>, <span style="color:#e6db74">&#39;mm_precip-4&#39;</span>, <span style="color:#e6db74">&#39;ctx-4&#39;</span>]]<span style="color:#f92672">.</span>values),
+</span></span><span style="display:flex;"><span>                     axis <span style="color:#f92672">=</span> <span style="color:#ae81ff">1</span>)
+</span></span><span style="display:flex;"><span>val24_target <span style="color:#f92672">=</span> y_val24[[<span style="color:#e6db74">&#39;percentage&#39;</span>]]<span style="color:#f92672">.</span>values
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">################################################################################</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>X_sub_static <span style="color:#f92672">=</span> X_submission[static_columns]<span style="color:#f92672">.</span>values
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>X_sub_ts <span style="color:#f92672">=</span> np<span style="color:#f92672">.</span>stack((X_submission[[<span style="color:#e6db74">&#39;temperature-1&#39;</span>, <span style="color:#e6db74">&#39;mm_precip-1&#39;</span>, <span style="color:#e6db74">&#39;ctx-1&#39;</span>]]<span style="color:#f92672">.</span>values,
+</span></span><span style="display:flex;"><span>                     X_submission[[<span style="color:#e6db74">&#39;temperature-2&#39;</span>, <span style="color:#e6db74">&#39;mm_precip-2&#39;</span>, <span style="color:#e6db74">&#39;ctx-2&#39;</span>]]<span style="color:#f92672">.</span>values,
+</span></span><span style="display:flex;"><span>                     X_submission[[<span style="color:#e6db74">&#39;temperature-3&#39;</span>, <span style="color:#e6db74">&#39;mm_precip-3&#39;</span>, <span style="color:#e6db74">&#39;ctx-3&#39;</span>]]<span style="color:#f92672">.</span>values,
+</span></span><span style="display:flex;"><span>                     X_submission[[<span style="color:#e6db74">&#39;temperature-4&#39;</span>, <span style="color:#e6db74">&#39;mm_precip-4&#39;</span>, <span style="color:#e6db74">&#39;ctx-4&#39;</span>]]<span style="color:#f92672">.</span>values),
+</span></span><span style="display:flex;"><span>                     axis <span style="color:#f92672">=</span> <span style="color:#ae81ff">1</span>)
+</span></span><span style="display:flex;"><span>					 
+</span></span><span style="display:flex;"><span>					 
+</span></span></code></pre></div><p>We construct a neural network by separating it into two parts, one for the time series data and one for the static data. The time series data is fed into an LSTM layer, the static data is fed into a dense layer</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> tensorflow <span style="color:#66d9ef">as</span> tf
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> keras
+</span></span><span style="display:flex;"><span><span style="color:#f92672">from</span> keras.layers <span style="color:#f92672">import</span> LSTM, Dense, Input, concatenate, Dropout, Bidirectional
+</span></span><span style="display:flex;"><span><span style="color:#f92672">from</span> keras.regularizers <span style="color:#f92672">import</span> l1, l2
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Construct eh neural network by separating it into two parts, one for the time series data and one for the static data</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># The time series data is fed into an LSTM layer, the static data is fed into a dense layer</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>ts_input <span style="color:#f92672">=</span> tf<span style="color:#f92672">.</span>keras<span style="color:#f92672">.</span>Input(shape<span style="color:#f92672">=</span>(<span style="color:#ae81ff">4</span>, <span style="color:#ae81ff">3</span>), name<span style="color:#f92672">=</span><span style="color:#e6db74">&#39;ts_input&#39;</span>)
+</span></span><span style="display:flex;"><span>static_input <span style="color:#f92672">=</span> tf<span style="color:#f92672">.</span>keras<span style="color:#f92672">.</span>Input(shape <span style="color:#f92672">=</span> (<span style="color:#ae81ff">17</span>,), name<span style="color:#f92672">=</span><span style="color:#e6db74">&#39;static_input&#39;</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">####################################################################################################</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>LSTM1 <span style="color:#f92672">=</span> LSTM(<span style="color:#ae81ff">64</span>, activation<span style="color:#f92672">=</span><span style="color:#e6db74">&#39;tanh&#39;</span>, return_sequences<span style="color:#f92672">=</span><span style="color:#66d9ef">True</span>)(ts_input)
+</span></span><span style="display:flex;"><span>dropout_lstm <span style="color:#f92672">=</span> Dropout(<span style="color:#ae81ff">0.1</span>)(LSTM1)
+</span></span><span style="display:flex;"><span>LSTM2 <span style="color:#f92672">=</span> LSTM(<span style="color:#ae81ff">64</span>, activation <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;tanh&#39;</span>, return_sequences <span style="color:#f92672">=</span> <span style="color:#66d9ef">False</span>)(dropout_lstm)
+</span></span><span style="display:flex;"><span>lstm_out <span style="color:#f92672">=</span> Dropout(<span style="color:#ae81ff">0.1</span>)(LSTM2)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">####################################################################################################</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>static1 <span style="color:#f92672">=</span> Dense(<span style="color:#ae81ff">32</span>, activation<span style="color:#f92672">=</span><span style="color:#e6db74">&#39;relu&#39;</span>)(static_input)
+</span></span><span style="display:flex;"><span>dropout_static <span style="color:#f92672">=</span> Dropout(<span style="color:#ae81ff">0.1</span>)(static1)
+</span></span><span style="display:flex;"><span>static2 <span style="color:#f92672">=</span> Dense(<span style="color:#ae81ff">64</span>, activation <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;relu&#39;</span>)(dropout_static)
+</span></span><span style="display:flex;"><span>dropout_static2 <span style="color:#f92672">=</span> Dropout(<span style="color:#ae81ff">0.1</span>)(static2)
+</span></span><span style="display:flex;"><span>static3 <span style="color:#f92672">=</span> Dense(<span style="color:#ae81ff">48</span>, activation <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;relu&#39;</span>)(dropout_static2)
+</span></span><span style="display:flex;"><span>dropout_static3 <span style="color:#f92672">=</span> Dropout(<span style="color:#ae81ff">0.1</span>)(static3)
+</span></span><span style="display:flex;"><span>static4 <span style="color:#f92672">=</span> Dense(<span style="color:#ae81ff">32</span>, activation <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;relu&#39;</span>)(dropout_static3)
+</span></span><span style="display:flex;"><span>static_out <span style="color:#f92672">=</span> Dropout(<span style="color:#ae81ff">0.1</span>)(static4)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">####################################################################################################</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>merged_out <span style="color:#f92672">=</span> concatenate([lstm_out, static_out]) <span style="color:#75715e"># join the outputs of the LSTM and dense layers and pass them into a final neuron</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>layer_out1 <span style="color:#f92672">=</span> Dense(<span style="color:#ae81ff">32</span>, activation <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;relu&#39;</span>)(merged_out)
+</span></span><span style="display:flex;"><span>dropout_out1 <span style="color:#f92672">=</span> Dropout(<span style="color:#ae81ff">0.1</span>)(layer_out1)
+</span></span><span style="display:flex;"><span>layer_out2 <span style="color:#f92672">=</span> Dense(<span style="color:#ae81ff">24</span>, activation <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;relu&#39;</span>)(dropout_out1)
+</span></span><span style="display:flex;"><span>dropout_out2 <span style="color:#f92672">=</span> Dropout(<span style="color:#ae81ff">0.1</span>)(layer_out2)
+</span></span><span style="display:flex;"><span>layer_out3 <span style="color:#f92672">=</span> Dense(<span style="color:#ae81ff">24</span>, activation <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;relu&#39;</span>)(dropout_out2)
+</span></span><span style="display:flex;"><span>dropout_out3 <span style="color:#f92672">=</span> Dropout(<span style="color:#ae81ff">0.1</span>)(layer_out3)
+</span></span><span style="display:flex;"><span>out_result <span style="color:#f92672">=</span> Dense(<span style="color:#ae81ff">1</span>, activation<span style="color:#f92672">=</span><span style="color:#e6db74">&#39;sigmoid&#39;</span>)(dropout_out3)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>model <span style="color:#f92672">=</span> tf<span style="color:#f92672">.</span>keras<span style="color:#f92672">.</span>Model(inputs<span style="color:#f92672">=</span>[ts_input, static_input], outputs<span style="color:#f92672">=</span>out_result)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>model<span style="color:#f92672">.</span>compile(optimizer<span style="color:#f92672">=</span><span style="color:#e6db74">&#39;adam&#39;</span>, loss<span style="color:#f92672">=</span><span style="color:#e6db74">&#39;mse&#39;</span>, metrics<span style="color:#f92672">=</span>[<span style="color:#e6db74">&#39;mse&#39;</span>])
+</span></span><span style="display:flex;"><span>model<span style="color:#f92672">.</span>summary()
+</span></span></code></pre></div><h4 id="neural-network-structure">Neural Network Structure</h4>
+<p><img src="/capstone-project/neural-network-structure.png" alt="Neural Network"></p>
+<h4 id="neural-network-results">Neural Network Results</h4>
+<p><img src="/capstone-project/neural-network-results.png" alt="Neural Network Results"></p>
+<p>We get recall similar results to that of the xgb model &ndash;&gt; Further improvements should come from the hand of a better preproccesing probably, working with outliers and incorrect data in a more detailed way</p>
+<h2 id="heatmap-and-buffer-analysis">Heatmap and Buffer Analysis</h2>
+<p>Search for areas that are near existing bike lanes but do not have a nearby bike station. The buffer has been set to 500 meters.</p>
+<h3 id="a-libraries">a. Libraries</h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> folium
+</span></span><span style="display:flex;"><span><span style="color:#f92672">from</span> folium.plugins <span style="color:#f92672">import</span> HeatMap
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> pandas <span style="color:#66d9ef">as</span> pd
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> json
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> numpy <span style="color:#66d9ef">as</span> np
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> dask.dataframe <span style="color:#66d9ef">as</span> dd
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> dash
+</span></span><span style="display:flex;"><span><span style="color:#f92672">from</span> dash.dependencies <span style="color:#f92672">import</span> Input, Output
+</span></span><span style="display:flex;"><span><span style="color:#f92672">from</span> dash <span style="color:#f92672">import</span> dcc <span style="color:#66d9ef">as</span> dcc
+</span></span><span style="display:flex;"><span><span style="color:#f92672">from</span> dash <span style="color:#f92672">import</span> html <span style="color:#66d9ef">as</span> html
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> base64
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> os
+</span></span><span style="display:flex;"><span><span style="color:#f92672">from</span> flask <span style="color:#f92672">import</span> Flask
+</span></span><span style="display:flex;"><span><span style="color:#f92672">from</span> io <span style="color:#f92672">import</span> BytesIO
+</span></span><span style="display:flex;"><span><span style="color:#f92672">from</span> jupyter_dash <span style="color:#f92672">import</span> JupyterDash
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> geopandas <span style="color:#66d9ef">as</span> gpd
+</span></span><span style="display:flex;"><span><span style="color:#f92672">from</span> shapely.geometry <span style="color:#f92672">import</span> LineString
+</span></span><span style="display:flex;"><span><span style="color:#f92672">from</span> shapely.geometry <span style="color:#f92672">import</span> Point, Polygon
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> geopy.distance
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> math
+</span></span></code></pre></div><p>Create a joined dataframe that will be used for the heatmap analysis</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span>df_info1 <span style="color:#f92672">=</span> dd<span style="color:#f92672">.</span>concat([train_df, validation_df])
+</span></span><span style="display:flex;"><span>df_info<span style="color:#f92672">.</span>head()
+</span></span></code></pre></div><p><img src="/capstone-project/heatmap-dataframe.png" alt="Heatmap Dataframe"></p>
+<h3 id="b-dash-definition-and-heatmap-generation">b. Dash Definition and HeatMap Generation</h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Dash definition</span>
+</span></span><span style="display:flex;"><span>app <span style="color:#f92672">=</span> JupyterDash(__name__)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">def</span> <span style="color:#a6e22e">generate_heatmap</span>(year, month):
+</span></span><span style="display:flex;"><span>    selected_info <span style="color:#f92672">=</span> df_info[(df_info[<span style="color:#e6db74">&#39;year&#39;</span>] <span style="color:#f92672">==</span> float(year)) <span style="color:#f92672">&amp;</span> (df_info[<span style="color:#e6db74">&#39;month&#39;</span>] <span style="color:#f92672">==</span> float(month))]
+</span></span><span style="display:flex;"><span>    print(<span style="color:#e6db74">&#34;Selected info:&#34;</span>)
+</span></span><span style="display:flex;"><span>    print(selected_info<span style="color:#f92672">.</span>head())
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    selected_info[<span style="color:#e6db74">&#39;average_percentage&#39;</span>] <span style="color:#f92672">=</span> selected_info[[<span style="color:#e6db74">&#39;percentage&#39;</span>, <span style="color:#e6db74">&#39;ctx-4&#39;</span>, <span style="color:#e6db74">&#39;ctx-3&#39;</span>, <span style="color:#e6db74">&#39;ctx-2&#39;</span>, <span style="color:#e6db74">&#39;ctx-1&#39;</span>]]<span style="color:#f92672">.</span>mean(axis<span style="color:#f92672">=</span><span style="color:#ae81ff">1</span>)
+</span></span><span style="display:flex;"><span>    average_availability <span style="color:#f92672">=</span> selected_info<span style="color:#f92672">.</span>groupby(<span style="color:#e6db74">&#39;station_id&#39;</span>)<span style="color:#f92672">.</span>mean()<span style="color:#f92672">.</span>reset_index()
+</span></span><span style="display:flex;"><span>    print(average_availability<span style="color:#f92672">.</span>head())
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    heatmap_data <span style="color:#f92672">=</span> [(row[<span style="color:#e6db74">&#39;lat&#39;</span>], row[<span style="color:#e6db74">&#39;lon&#39;</span>], <span style="color:#ae81ff">1</span> <span style="color:#f92672">-</span> row[<span style="color:#e6db74">&#39;average_percentage&#39;</span>]) <span style="color:#66d9ef">for</span> idx, row <span style="color:#f92672">in</span> average_availability<span style="color:#f92672">.</span>iterrows()]
+</span></span><span style="display:flex;"><span>    print(heatmap_data[:<span style="color:#ae81ff">5</span>])
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    folium_map <span style="color:#f92672">=</span> folium<span style="color:#f92672">.</span>Map(location<span style="color:#f92672">=</span>[<span style="color:#ae81ff">41.3870154</span>, <span style="color:#ae81ff">2.1700471</span>], zoom_start<span style="color:#f92672">=</span><span style="color:#ae81ff">13</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">with</span> open(<span style="color:#e6db74">&#39;/content/drive/MyDrive/CapstoneProject/CARRIL_BICI.geojson&#39;</span>) <span style="color:#66d9ef">as</span> f:
+</span></span><span style="display:flex;"><span>        bikelane_data <span style="color:#f92672">=</span> json<span style="color:#f92672">.</span>load(f)
+</span></span><span style="display:flex;"><span>    folium<span style="color:#f92672">.</span>GeoJson(bikelane_data)<span style="color:#f92672">.</span>add_to(folium_map)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    HeatMap(heatmap_data)<span style="color:#f92672">.</span>add_to(folium_map)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e"># Map saved as html</span>
+</span></span><span style="display:flex;"><span>    folium_map<span style="color:#f92672">.</span>save(<span style="color:#e6db74">&#39;/tmp/temp_map.html&#39;</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e"># Copy in Google drive</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#960050;background-color:#1e0010">!</span>cp <span style="color:#f92672">/</span>tmp<span style="color:#f92672">/</span>temp_map<span style="color:#f92672">.</span>html <span style="color:#f92672">/</span>content<span style="color:#f92672">/</span>drive<span style="color:#f92672">/</span>MyDrive<span style="color:#f92672">/</span>CapstoneProject<span style="color:#f92672">/</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Initial map for the first year and month</span>
+</span></span><span style="display:flex;"><span>generate_heatmap(years[<span style="color:#ae81ff">0</span>], months[<span style="color:#ae81ff">0</span>])
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Dash Layout</span>
+</span></span><span style="display:flex;"><span>app<span style="color:#f92672">.</span>layout <span style="color:#f92672">=</span> html<span style="color:#f92672">.</span>Div([
+</span></span><span style="display:flex;"><span>    html<span style="color:#f92672">.</span>H1(<span style="color:#e6db74">&#34;Disponibilidad de estaciones de Bicing&#34;</span>),
+</span></span><span style="display:flex;"><span>    html<span style="color:#f92672">.</span>H2(id<span style="color:#f92672">=</span><span style="color:#e6db74">&#39;map-title&#39;</span>, children<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;Disponibilidad: Mes/Año&#34;</span>),
+</span></span><span style="display:flex;"><span>    dcc<span style="color:#f92672">.</span>Dropdown(
+</span></span><span style="display:flex;"><span>        id<span style="color:#f92672">=</span><span style="color:#e6db74">&#39;year-dropdown&#39;</span>,
+</span></span><span style="display:flex;"><span>        options<span style="color:#f92672">=</span>[{<span style="color:#e6db74">&#39;label&#39;</span>: str(year), <span style="color:#e6db74">&#39;value&#39;</span>: year} <span style="color:#66d9ef">for</span> year <span style="color:#f92672">in</span> years],
+</span></span><span style="display:flex;"><span>        value<span style="color:#f92672">=</span>years[<span style="color:#ae81ff">0</span>]
+</span></span><span style="display:flex;"><span>    ),
+</span></span><span style="display:flex;"><span>    dcc<span style="color:#f92672">.</span>Dropdown(
+</span></span><span style="display:flex;"><span>        id<span style="color:#f92672">=</span><span style="color:#e6db74">&#39;month-dropdown&#39;</span>,
+</span></span><span style="display:flex;"><span>        options<span style="color:#f92672">=</span>[{<span style="color:#e6db74">&#39;label&#39;</span>: str(month), <span style="color:#e6db74">&#39;value&#39;</span>: month} <span style="color:#66d9ef">for</span> month <span style="color:#f92672">in</span> months],
+</span></span><span style="display:flex;"><span>        value<span style="color:#f92672">=</span>months[<span style="color:#ae81ff">0</span>]
+</span></span><span style="display:flex;"><span>    ),
+</span></span><span style="display:flex;"><span>    html<span style="color:#f92672">.</span>Iframe(id <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;map&#39;</span>, srcDoc <span style="color:#f92672">=</span> open(<span style="color:#e6db74">&#39;/content/drive/MyDrive/CapstoneProject/temp_map.html&#39;</span>, <span style="color:#e6db74">&#39;r&#39;</span>)<span style="color:#f92672">.</span>read(), width <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;100%&#39;</span>, height <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;600&#39;</span>)
+</span></span><span style="display:flex;"><span>])
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>   <span style="color:#75715e"># Map update</span>
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">@app.callback</span>(
+</span></span><span style="display:flex;"><span>    [Output(<span style="color:#e6db74">&#39;map&#39;</span>, <span style="color:#e6db74">&#39;srcDoc&#39;</span>),
+</span></span><span style="display:flex;"><span>    Output(<span style="color:#e6db74">&#39;map-title&#39;</span>, <span style="color:#e6db74">&#39;children&#39;</span>)],
+</span></span><span style="display:flex;"><span>    [Input(<span style="color:#e6db74">&#39;year-dropdown&#39;</span>, <span style="color:#e6db74">&#39;value&#39;</span>),
+</span></span><span style="display:flex;"><span>    Input(<span style="color:#e6db74">&#39;month-dropdown&#39;</span>, <span style="color:#e6db74">&#39;value&#39;</span>)])
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">def</span> <span style="color:#a6e22e">update_map</span>(year, month):
+</span></span><span style="display:flex;"><span>    generate_heatmap(year, month)
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> open(<span style="color:#e6db74">&#39;/content/drive/MyDrive/CapstoneProject/temp_map.html&#39;</span>, <span style="color:#e6db74">&#39;r&#39;</span>)<span style="color:#f92672">.</span>read(), <span style="color:#e6db74">f</span><span style="color:#e6db74">&#39;Disponibilidad: </span><span style="color:#e6db74">{</span>month<span style="color:#e6db74">}</span><span style="color:#e6db74">/</span><span style="color:#e6db74">{</span>year<span style="color:#e6db74">}</span><span style="color:#e6db74">&#39;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">if</span> __name__ <span style="color:#f92672">==</span> <span style="color:#e6db74">&#39;__main__&#39;</span>:
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>   app<span style="color:#f92672">.</span>run_server(debug<span style="color:#f92672">=</span><span style="color:#66d9ef">True</span>)
+</span></span><span style="display:flex;"><span>   
+</span></span><span style="display:flex;"><span>   
+</span></span><span style="display:flex;"><span><span style="color:#f92672">from</span> math <span style="color:#f92672">import</span> radians, cos, sin, asin, sqrt
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">def</span> <span style="color:#a6e22e">calculate_distance</span>(lat1, lon1, lat2, lon2):
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e"># Convert coordinates from degrees to radians</span>
+</span></span><span style="display:flex;"><span>    lon1, lat1, lon2, lat2 <span style="color:#f92672">=</span> map(radians, [lon1, lat1, lon2, lat2])
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e"># haversine</span>
+</span></span><span style="display:flex;"><span>    dlon <span style="color:#f92672">=</span> lon2 <span style="color:#f92672">-</span> lon1
+</span></span><span style="display:flex;"><span>    dlat <span style="color:#f92672">=</span> lat2 <span style="color:#f92672">-</span> lat1
+</span></span><span style="display:flex;"><span>    a <span style="color:#f92672">=</span> sin(dlat<span style="color:#f92672">/</span><span style="color:#ae81ff">2</span>)<span style="color:#f92672">**</span><span style="color:#ae81ff">2</span> <span style="color:#f92672">+</span> cos(lat1) <span style="color:#f92672">*</span> cos(lat2) <span style="color:#f92672">*</span> sin(dlon<span style="color:#f92672">/</span><span style="color:#ae81ff">2</span>)<span style="color:#f92672">**</span><span style="color:#ae81ff">2</span>
+</span></span><span style="display:flex;"><span>    c <span style="color:#f92672">=</span> <span style="color:#ae81ff">2</span> <span style="color:#f92672">*</span> asin(sqrt(a))
+</span></span><span style="display:flex;"><span>    r <span style="color:#f92672">=</span> <span style="color:#ae81ff">6371</span>  <span style="color:#75715e"># Earth radius in km</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> c <span style="color:#f92672">*</span> r <span style="color:#f92672">*</span> <span style="color:#ae81ff">1000</span>  <span style="color:#75715e"># Convert to meters</span>
+</span></span><span style="display:flex;"><span>   
+</span></span></code></pre></div><h3 id="c-bicing-heatmap-generation">c. Bicing HeatMap Generation</h3>
+<p><img src="/capstone-project/bicing-heatmap-capture.png" alt="Heatmap"></p>
+<p><img src="/capstone-project/bicing-heatmap-capture2.png" alt="Heatmap2"></p>
 
         </p>
         
@@ -411,25 +972,46 @@ The flow has two subflows because is necesary applied the same process to bicing
           <ul>
             <li><a href="#a-tableau-workflow">a. Tableau Workflow</a></li>
             <li><a href="#b-analysis-in-tableau">b. Analysis in Tableau</a></li>
-            <li><a href="#basic-configuration">c. Basic Configuration</a></li>
-            <li><a href="#d-create-your-first-post">d. Create Your First Post</a></li>
-            <li><a href="#e-launching-the-website-locally">e. Launching the Website Locally</a></li>
-            <li><a href="#f-build-the-website">f. Build the Website</a></li>
           </ul>
         </li>
-        <li><a href="#configuration">Configuration</a>
+        <li><a href="#prepare-the-data-for-machine-learning-algorithms">Prepare the data for Machine Learning algorithms</a>
           <ul>
-            <li><a href="#avatar-url">Avatar URL</a></li>
-            <li><a href="#avatar-size">Avatar Size</a></li>
-            <li><a href="#description">Description</a></li>
-            <li><a href="#accent-color">Accent Color</a></li>
-            <li><a href="#posts-on-home-page">Posts on home page</a></li>
-            <li><a href="#footer">Footer</a></li>
-            <li><a href="#previous-and-next-buttons">Previous and Next buttons</a></li>
-            <li><a href="#displaying-content-on-the-homepage">Displaying content on the homepage</a></li>
-            <li><a href="#custom-head-html">Custom Head HTML</a></li>
-            <li><a href="#robotstxt">robots.txt</a></li>
-            <li><a href="#favicons-browserconfig-manifest">Favicons, Browserconfig, Manifest</a></li>
+            <li><a href="#a-importation-of-data-in-colab">a. Importation of data in Colab</a></li>
+            <li><a href="#b-data-cleaning-and-filtering">b. Data Cleaning and Filtering</a></li>
+            <li><a href="#c-processing-pipelines">c. Processing pipelines</a></li>
+            <li><a href="#d-classes-and-functions">d. Classes and Functions</a></li>
+            <li><a href="#e-prepare-all-data-and-load-data-that-has-been-saved">e. Prepare all data and load data that has been saved</a>
+              <ul>
+                <li><a href="#training-dataset">Training Dataset</a></li>
+                <li><a href="#validation-dataset-5-hr">Validation Dataset (5 hr)</a></li>
+                <li><a href="#validation-dataset-with-all-hours-24-hr">Validation Dataset with all hours (24 hr)</a></li>
+                <li><a href="#submission-dataset-testing-dataset">Submission Dataset (Testing Dataset)</a></li>
+              </ul>
+            </li>
+          </ul>
+        </li>
+        <li><a href="#model-selection-and-training">Model Selection and Training</a>
+          <ul>
+            <li><a href="#a-xgbregressor">a. XGBregressor</a>
+              <ul>
+                <li><a href="#randomizedsearchcv-and-gridsearchcv">RandomizedSearchCV and GridSearchCV</a></li>
+                <li><a href="#loss-function-graphic">Loss Function Graphic</a></li>
+                <li><a href="#most-relevant-features">Most Relevant Features</a></li>
+              </ul>
+            </li>
+            <li><a href="#b-lstm">b. LSTM</a>
+              <ul>
+                <li><a href="#neural-network-structure">Neural Network Structure</a></li>
+                <li><a href="#neural-network-results">Neural Network Results</a></li>
+              </ul>
+            </li>
+          </ul>
+        </li>
+        <li><a href="#heatmap-and-buffer-analysis">Heatmap and Buffer Analysis</a>
+          <ul>
+            <li><a href="#a-libraries">a. Libraries</a></li>
+            <li><a href="#b-dash-definition-and-heatmap-generation">b. Dash Definition and HeatMap Generation</a></li>
+            <li><a href="#c-bicing-heatmap-generation">c. Bicing HeatMap Generation</a></li>
           </ul>
         </li>
       </ul>

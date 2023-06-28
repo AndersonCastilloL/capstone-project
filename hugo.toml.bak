@@ -1,4 +1,4 @@
-baseURL = "https://andersoncastillol.github.io/capstone-project/"
+baseURL = "https://andersoncastillol.github.io/capstone-project"
 publishDir = "docs"
 languageCode = "en"
 title = "Bike Availability Prediction Project"
@@ -10,6 +10,7 @@ disqusShortname = "ilusionismo-con-github-pages"
   category = "categories"
 
 [params]
+  showPostsOnHomePage = "popular"
   footer = "The Cyclists"
   description = "Data Science & Machine Learning Final Project"
 
@@ -46,7 +47,7 @@ metaKeywords = ["blog", "gokarna", "hugo"]
   [[menu.main]]
     identifier = "github"
     pre = "<span data-feather='github'></span>"
-    url = "https://github.com/526avijitgupta/gokarna"
+    url = "https://github.com/AndersonCastilloL/capstone-project"
     weight = 4
 
 

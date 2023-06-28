@@ -10,18 +10,10 @@ disqusShortname = "ilusionismo-con-github-pages"
   category = "categories"
 
 [params]
+  showPostsOnHomePage = "popular"
   footer = "The Cyclists"
   description = "Data Science & Machine Learning Final Project"
 
-socialIcons = [
-    {name = "twitter", url = "https://example.com"},
-    {name = "linkedin", url = "https://example.com"},
-    {name = "stackoverflow", url = "https://example.com"},
-    {name = "dribbble", url = "https://example.com"},
-    {name = "instagram", url = "https://example.com"},
-    {name = "twitch", url = "https://example.com"},
-    {name = "email", url = "mailto:example@example.com"}
-]
 metaKeywords = ["blog", "gokarna", "hugo"]
 
 [menu]
@@ -46,7 +38,7 @@ metaKeywords = ["blog", "gokarna", "hugo"]
   [[menu.main]]
     identifier = "github"
     pre = "<span data-feather='github'></span>"
-    url = "https://github.com/526avijitgupta/gokarna"
+    url = "https://github.com/AndersonCastilloL/capstone-project"
     weight = 4
 
 
