@@ -49,7 +49,7 @@ The consolidation of the Data was built in Tableau using Tableau Prep which give
 
 #### Metadata Sample Submission
 
-![Metadata Sample Submission](/capstone-project/assets/metadata-sample-submission.png)
+![Metadata Sample Submission](/images/metadata-sample-submission.png)
 
 ## Discover and visualize the data to gain insights
 
@@ -60,19 +60,19 @@ Data consolidation, visualization and analysis with Tableau
 The first flow in Tableau Prep let you consolidate the bicing station status files of all years and create new columns like year, month, day and hour. 
 The flow has two subflows because is necesary applied the same process to bicing station 2023 files. Both flows create new files with a hyper format which is easier to manage and control the data.
 
-![First Tableau flow](/capstone-project/assets/first-tableau-flow.png)
+![First Tableau flow](/first-tableau-flow.png)
 
 The second flow in Tableau Prep get the hyper files of bicing station status (2019-2022) to join with the last bicing station information (March, 2023) to get the extra information like longitude, lattitude, name, capacity and postcode.
 
-![Second Tableau flow](/capstone-project/assets/second-tableau-flow.png)
+![Second Tableau flow](/second-tableau-flow.png)
 
 The same process is applied to the bicing station status 2023 but filtering docks_availability and bike_availability. These fields will be evaluated and predicted by the models.
 
-![Third Tableau flow](/capstone-project/assets/third-tableau-flow.png)
+![Third Tableau flow](/third-tableau-flow.png)
 
 Finally, the last flow transform the input data of the preview flow using a aggregation to the level year, month, day and hour calculating average of the rest of fields and creating four aditionals fields with the porcent of docks availability in the four hours before.
 
-![Fourth Tableau flow](/capstone-project/assets/fourth-tableau-flow.png)
+![Fourth Tableau flow](/fourth-tableau-flow.png)
 
 Before training and testing, the data is analyzed to identify patterns, outliers and to visualize relevant features.
 
@@ -80,7 +80,7 @@ Before training and testing, the data is analyzed to identify patterns, outliers
 
 Visual analysis of data constructed based on the final output to identify outliers, COVID behaviors and relevant characteristics before training and testing with machine learning models
 
-![Bicing Data Analysis](/capstone-project/assets/bicing-data-analysis.png)
+![Bicing Data Analysis](/bicing-data-analysis.png)
 
 
 The theme’s repository is: [https://github.com/526avijitgupta/gokarna](https://github.com/526avijitgupta/gokarna).

@@ -184,23 +184,23 @@
 </span></span></code></pre></div><h3 id="b-consolidate-the-data">b. Consolidate the Data</h3>
 <p>The consolidation of the Data was built in Tableau using Tableau Prep which give us more flexibility to join, filter and build the next structure according with our metadata-sample-submission.csv</p>
 <h4 id="metadata-sample-submission">Metadata Sample Submission</h4>
-<p><img src="/capstone-project/assets/metadata-sample-submission.png" alt="Metadata Sample Submission"></p>
+<p><img src="/images/metadata-sample-submission.png" alt="Metadata Sample Submission"></p>
 <h2 id="discover-and-visualize-the-data-to-gain-insights">Discover and visualize the data to gain insights</h2>
 <p>Data consolidation, visualization and analysis with Tableau</p>
 <h3 id="a-tableau-workflow">a. Tableau Workflow</h3>
 <p>The first flow in Tableau Prep let you consolidate the bicing station status files of all years and create new columns like year, month, day and hour.
 The flow has two subflows because is necesary applied the same process to bicing station 2023 files. Both flows create new files with a hyper format which is easier to manage and control the data.</p>
-<p><img src="/capstone-project/assets/first-tableau-flow.png" alt="First Tableau flow"></p>
+<p><img src="/first-tableau-flow.png" alt="First Tableau flow"></p>
 <p>The second flow in Tableau Prep get the hyper files of bicing station status (2019-2022) to join with the last bicing station information (March, 2023) to get the extra information like longitude, lattitude, name, capacity and postcode.</p>
-<p><img src="/capstone-project/assets/second-tableau-flow.png" alt="Second Tableau flow"></p>
+<p><img src="/second-tableau-flow.png" alt="Second Tableau flow"></p>
 <p>The same process is applied to the bicing station status 2023 but filtering docks_availability and bike_availability. These fields will be evaluated and predicted by the models.</p>
-<p><img src="/capstone-project/assets/third-tableau-flow.png" alt="Third Tableau flow"></p>
+<p><img src="/third-tableau-flow.png" alt="Third Tableau flow"></p>
 <p>Finally, the last flow transform the input data of the preview flow using a aggregation to the level year, month, day and hour calculating average of the rest of fields and creating four aditionals fields with the porcent of docks availability in the four hours before.</p>
-<p><img src="/capstone-project/assets/fourth-tableau-flow.png" alt="Fourth Tableau flow"></p>
+<p><img src="/fourth-tableau-flow.png" alt="Fourth Tableau flow"></p>
 <p>Before training and testing, the data is analyzed to identify patterns, outliers and to visualize relevant features.</p>
 <h3 id="b-analysis-in-tableau">b. Analysis in Tableau</h3>
 <p>Visual analysis of data constructed based on the final output to identify outliers, COVID behaviors and relevant characteristics before training and testing with machine learning models</p>
-<p><img src="/capstone-project/assets/bicing-data-analysis.png" alt="Bicing Data Analysis"></p>
+<p><img src="/bicing-data-analysis.png" alt="Bicing Data Analysis"></p>
 <p>The theme’s repository is: <a href="https://github.com/526avijitgupta/gokarna">https://github.com/526avijitgupta/gokarna</a>.</p>
 <p>You can download the <a href="https://github.com/526avijitgupta/gokarna/releases">latest release :books: .zip file</a> of the theme and extract it in the <code>themes</code> directory.</p>
 <p>Alternatively, clone this repository to the <code>themes</code> directory:</p>
