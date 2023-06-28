@@ -1,4 +1,4 @@
-# ---
+---
 weight: 10
 title: "Capstone Project Documentation"
 date: 2023-06-26T21:29:01+08:00
@@ -42,7 +42,6 @@ for year in [2022, 2021, 2020, 2019]:
         os.system(f"rm '{year}_{month:02d}_{month_name}_BicingNou_ESTACIONS.7z'")
 
 ```
-
 ### b. Consolidate the Data
 
 The consolidation of the Data was built in Tableau using Tableau Prep which give us more flexibility to join, filter and build the next structure according with our metadata-sample-submission.csv

@@ -1,4 +1,4 @@
-baseURL = "https://andersoncastillol.github.io/capstone-project/"
+baseURL = "https://andersoncastillol.github.io/capstone-project"
 publishDir = "docs"
 languageCode = "en"
 title = "Bike Availability Prediction Project"
@@ -6,11 +6,10 @@ theme = "gokarna"
 disqusShortname = "ilusionismo-con-github-pages"
 
 [taxonomies]
-tag = "tags"
-category = "categories"
+  tag = "tags"
+  category = "categories"
 
 [params]
-  showPostsOnHomePage = "popular"
   footer = "The Cyclists"
   description = "Data Science & Machine Learning Final Project"
 
