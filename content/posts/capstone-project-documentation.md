@@ -1,4 +1,4 @@
----
+# ---
 weight: 10
 title: "Capstone Project Documentation"
 date: 2023-06-26T21:29:01+08:00
@@ -8,22 +8,80 @@ type: post
 showTableOfContents: true
 ---
 
-Gokarna is an opinionated theme with a focus on minimalism and simplicity.
+## What's Bicing ?
 
-## Installation
+The new Bicing service includes more territorial coverage, an increase in the number of bicycles, mixed stations for conventional and electric bicycles, new and improved types of stations and bicycles (safety, anchorage, comfort), extended schedules and much more!
 
-The following steps are here to help you initialize your new website. If you don’t know Hugo at all, we strongly suggest you learn more about it by following this [great documentation for beginners](https://gohugo.io/getting-started/quick-start/).
+## Goal
 
-### a. Create Your Project
+There are two main objective in this project:
 
-Hugo provides a `new` command to create a new website:
+- Predict the number of free docks given the historical data (Docks Availability Percent).
+
+- Explore new places where stations are needed.
+
+- Explore how different events affect availability.
+
+
+## Get the Data
+
+The Bicing stations status and information of the city of Barcelona were downloaded from [Open Data BCN](https://opendata-ajuntament.barcelona.cat)
+
+### a. Download the Data
+
+The following script was used to download the data by year and month:
 
 ```bash
-hugo new site my_website
-cd my_website
+import os
+
+i2m = list(zip(range(1,13), ['Gener','Febrer','Marc','Abril','Maig','Juny','Juliol','Agost','Setembre','Octubre','Novembre','Desembre']))
+for year in [2022, 2021, 2020, 2019]:
+    for month, month_name in i2m:        
+        os.system(f"wget 'https://opendata-ajuntament.barcelona.cat/resources/bcn/BicingBCN/{year}_{month:02d}_{month_name}_BicingNou_ESTACIONS.7z'")
+        os.system(f"7z x '{year}_{month:02d}_{month_name}_BicingNou_ESTACIONS.7z'")
+        os.system(f"rm '{year}_{month:02d}_{month_name}_BicingNou_ESTACIONS.7z'")
+
 ```
 
-### b. Install the Theme
+### b. Consolidate the Data
+
+The consolidation of the Data was built in Tableau using Tableau Prep which give us more flexibility to join, filter and build the next structure according with our metadata-sample-submission.csv
+
+#### Metadata Sample Submission
+
+![Metadata Sample Submission](/metadata-sample-submission.png)
+
+## Discover and visualize the data to gain insights
+
+Data consolidation, visualization and analysis with Tableau
+
+### a. Tableau Workflow
+
+The first flow in Tableau Prep let you consolidate the bicing station status files of all years and create new columns like year, month, day and hour. 
+The flow has two subflows because is necesary applied the same process to bicing station 2023 files. Both flows create new files with a hyper format which is easier to manage and control the data.
+
+![First Tableau flow](/first-tableau-flow.png)
+
+The second flow in Tableau Prep get the hyper files of bicing station status (2019-2022) to join with the last bicing station information (March, 2023) to get the extra information like longitude, lattitude, name, capacity and postcode.
+
+![Second Tableau flow](/second-tableau-flow.png)
+
+The same process is applied to the bicing station status 2023 but filtering docks_availability and bike_availability. These fields will be evaluated and predicted by the models.
+
+![Third Tableau flow](/third-tableau-flow.png)
+
+Finally, the last flow transform the input data of the preview flow using a aggregation to the level year, month, day and hour calculating average of the rest of fields and creating four aditionals fields with the porcent of docks availability in the four hours before.
+
+![Fourth Tableau flow](/fourth-tableau-flow.png)
+
+Before training and testing, the data is analyzed to identify patterns, outliers and to visualize relevant features.
+
+### b. Analysis in Tableau
+
+Visual analysis of data constructed based on the final output to identify outliers, COVID behaviors and relevant characteristics before training and testing with machine learning models
+
+![Bicing Data Analysis](/bicing-data-analysis.png)
+
 
 The theme’s repository is: [https://github.com/526avijitgupta/gokarna](https://github.com/526avijitgupta/gokarna).
 
