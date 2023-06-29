@@ -341,8 +341,8 @@ We will start off with the xgboost models.</p>
 </span></span><span style="display:flex;"><span>                          random_state<span style="color:#f92672">=</span><span style="color:#ae81ff">128</span>,
 </span></span><span style="display:flex;"><span>                          early_stopping_rounds <span style="color:#f92672">=</span> <span style="color:#ae81ff">30</span>)
 </span></span></code></pre></div><p>Obtaining a slightly lower final rmse score (0.1019 vs 0.1100) and the following dfeature imporances and loss evolution curves:</p>
-<p><img src="/capstone-project/xgb_loss2.png" alt="Loss Function graphic">
-<img src="/capstone-project/xgb2_features.png" alt="Feature Importances Graphic"></p>
+<p><img src="/capstone-project/xgb_loss2.png" alt="Loss Function graphic"></p>
+<p><img src="/capstone-project/xgb2_features.png" alt="Feature Importances Graphic"></p>
 <p>Which in this case show quite a bit more overfitting due to the complexity of the model and also more relevance given to the location of the stations. The temperature now also appears in the feature importance plot, but still not the rain.</p>
 <h3 id="b-lstm">b. LSTM</h3>
 <p>Apart from our xgbregressor model, and since our data contains historical data, we have also tried to study the prediction problem as a time-series analysis by working with long short-term memory layers on a neural network to try and exploit the temporal ordering of the information. Since not all the variables are historical, that have built a time series with just the one that are historical context, and we have treated the rest with a fully connected network. By using this approach our intention is to capture not only the static context of the data, but also the past that leads to each station&rsquo;s state.</p>
@@ -373,6 +373,7 @@ We have also added droupout layers to prevent overfitting (we will see that that
 <p>The resulting map is saved as an HTML file in a temporary location and then the interface powered by Dash includes dropdown menus for selecting the month and year of interest. The map updates dynamically based on these selections, providing a tool for exploring dock availability across different times.</p>
 <p><img src="/capstone-project/bicing-heatmap-capture.png" alt="Heatmap"></p>
 <p><img src="/capstone-project/bicing-heatmap-capture2.png" alt="Heatmap2"></p>
+<p>Where the interactive version can be found in the notebook, when running the cells corresponding to this section at the end using Colab</p>
 <p>Remarks: If we compare the different periods, we can see that in general, the downtown is the area where there is a major use of bicycle and therefore less availability.</p>
 <h3 id="b-buffer-analysis">b. Buffer Analysis</h3>
 <p>This produces a heatmap representing the average availability of bikes at different stations in march 2023 including the buffer analysis around bike lanes.</p>
@@ -381,6 +382,8 @@ We have also added droupout layers to prevent overfitting (we will see that that
 <p>A base map of the city is created using Folium and the bike lanes data is loaded from a GeoJSON file and added to the map.The heatmap is added to the map using the previously computed bike station data.</p>
 <p>The script then performs the buffer analysis. It iterates through each bike lane segment and checks if it&rsquo;s more than 500 meters away from any bike station. If it is, a marker is added to that point on the map. This analysis helps identify undeserved areas where additional bike stations might be needed. Then is saved as an html.</p>
 <p>The output is the following:</p>
+<p><a href="/capstone-project/map_marker.png">Heatmap</a></p>
+<p>Or you can see it in the following html link:</p>
 <p><a href="/capstone-project/temp_map_no_mark23.html">Buffer Analysis</a></p>
 <p>Remarks: With this buffer analysis we can see that there are several areas in the city that might need a station, such as Zona franca, the port of Barcelona or near Sant Adria de Besos.</p>
 
@@ -474,7 +477,7 @@ We have also added droupout layers to prevent overfitting (we will see that that
     
 
     
-    <span>&copy; 2023 The Cyclists</span>
+    <span>&copy; 2023 The Cyclists: Pau Torrente - Anderson Castillo - Rohit Lachman</span>
     
     <span>
         Made with &#10084;&#65039; using <a target="_blank" href="https://github.com/526avijitgupta/gokarna">Gokarna</a>
