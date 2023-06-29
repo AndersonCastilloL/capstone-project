@@ -13,7 +13,7 @@ author = 'Pau Torrente - Anderson Castillo - Rohit Lachman'
 [params]
   AuthorName = 'Pau Torrente - Anderson Castillo - Rohit Lachman'
   showPostsOnHomePage = "popular"
-  footer = "The Cyclists"
+  footer = "The Cyclists: Pau Torrente - Anderson Castillo - Rohit Lachman"
   description = "Data Science & Machine Learning Final Project"
   customFooterHTML = """
     <!-- KaTeX -->
